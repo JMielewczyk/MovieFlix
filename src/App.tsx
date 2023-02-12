@@ -60,7 +60,8 @@ function App() {
         <div className="w-screen bg-black pt-20">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/movie/:movieid" element={<Movie />} />
+            <Route path="/:mediatype/:movieid" element={<Movie />} />
+            <Route path="/:mediatype/:movieid" element={<Movie />} />
             <Route path="/actors/:actorid" element={<Actors />} />
           </Routes>
         </div>

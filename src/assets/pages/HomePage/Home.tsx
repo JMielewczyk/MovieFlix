@@ -9,41 +9,45 @@ import {
 } from '../../utils/fetchFunctions';
 
 const Home = () => {
+  const [mediaType, setMediaType] = useState('movie');
+  const [timeWindow, setTimeWindow] = useState('day');
   const [featuredMovieID, setFeaturedMovieID] = useState('');
   const [featuredMovieImage, setFeaturedMovieImage] = useState('');
   const [genres, setGenres] = useState<string[]>([]);
-  const [trendingMoviesToday, setTrendingMoviesToday] =
-    useState<null | Array<Object>>(null);
-  const [trendingMoviesWeekly, setTrendingMoviesWeekly] =
-    useState<null | Array<Object>>(null);
-  const [trendingMovies, setTrendingMovies] = useState<null | Array<Object>>(
-    null
-  );
-  const [buttonToday, setButtonToday] = useState(false);
-  const [buttonWeekly, setButtonWeekly] = useState(false);
-  const [topRatedMovies, setTopRatedMovies] = useState<null | Array<Object>>(
-    null
-  );
+  const [trending, setTrending] = useState<null | Array<Object>>(null);
+  const [topRated, setTopRated] = useState<null | Array<Object>>(null);
   const [actors, setActors] = useState<null | Array<Object>>(null);
   const navigate = useNavigate();
   const urlForImageFetch = 'https://image.tmdb.org/t/p/original';
   useEffect(() => {
-    loadFeatured(setFeaturedMovieImage, setFeaturedMovieID, setGenres);
-    loadTrending(
-      setTrendingMoviesToday,
-      setTrendingMovies,
-      setButtonToday,
-      setTrendingMoviesWeekly
+    loadFeatured(
+      setFeaturedMovieImage,
+      setFeaturedMovieID,
+      setGenres,
+      mediaType,
+      timeWindow
     );
-    loadTopRated(setTopRatedMovies);
+    loadTrending(setTrending, mediaType, timeWindow);
+    loadTopRated(setTopRated, mediaType);
     loadPopularActors(setActors);
   }, []);
+  useEffect(() => {
+    loadFeatured(
+      setFeaturedMovieImage,
+      setFeaturedMovieID,
+      setGenres,
+      mediaType,
+      timeWindow
+    );
+    loadTrending(setTrending, mediaType, timeWindow);
+    loadTopRated(setTopRated, mediaType);
+  }, [mediaType, timeWindow]);
   return (
     <div className="flex flex-col w-screen min-h-screen bg-black gap-10 overflow-x-hidden">
       <header className="w-screen h-4/5 pl-5 pr-5">
-        <div className="w-full h-full relative">
+        <div className="w-full h-full relative rounded-lg overflow-hidden">
           <img
-            className="w-full h-full rounded-lg object-fill"
+            className="w-full h-full object-fill"
             src={featuredMovieImage}
             alt=" "
           />
@@ -51,7 +55,7 @@ const Home = () => {
             to={`movie/${featuredMovieID}`}
             className="absolute top-0 w-full h-3/4"
           ></Link>
-          <div className="absolute flex-col flex-wrap top-3/4 w-full flex h-1/4 justify-around items-center pr-5 pl-5 backdrop-blur-sm">
+          <div className="absolute flex-col flex-wrap bottom-0 w-full flex h-1/5 justify-evenly items-center pr-5 pl-5 backdrop-blur-sm">
             <div className="flex flex-row justify-evenly w-full items-center">
               {genres &&
                 genres.map((element, index) => {
@@ -67,7 +71,7 @@ const Home = () => {
                   }
                 })}
             </div>
-            <div className="w-full h-10  flex justify-between gap-5">
+            <div className="w-full h-10 flex justify-between gap-5">
               <button
                 onClick={() => {
                   navigate(`movie/${featuredMovieID}`);
@@ -89,12 +93,10 @@ const Home = () => {
           <div className="flex w-full h-7 gap-5">
             <button
               onClick={() => {
-                setButtonWeekly(false);
-                setButtonToday(true);
-                setTrendingMovies(trendingMoviesToday);
+                setTimeWindow('day');
               }}
               className={
-                buttonToday
+                timeWindow === 'day'
                   ? 'bg-green-400 rounded-lg pl-2.5 pr-2.5'
                   : 'bg-white rounded-lg pl-2.5 pr-2.5'
               }
@@ -103,12 +105,10 @@ const Home = () => {
             </button>
             <button
               onClick={() => {
-                setButtonWeekly(true);
-                setButtonToday(false);
-                setTrendingMovies(trendingMoviesWeekly);
+                setTimeWindow('week');
               }}
               className={
-                buttonWeekly
+                timeWindow === 'week'
                   ? 'bg-green-400 rounded-lg pl-2.5 pr-2.5'
                   : 'bg-white rounded-lg pl-2.5 pr-2.5'
               }
@@ -116,39 +116,73 @@ const Home = () => {
               Weekly
             </button>
           </div>
+          <div className="flex w-full h-7 gap-5">
+            <button
+              onClick={() => {
+                setMediaType('movie');
+              }}
+              className={
+                mediaType === 'movie'
+                  ? 'bg-green-400 rounded-lg pl-2.5 pr-2.5'
+                  : 'bg-white rounded-lg pl-2.5 pr-2.5'
+              }
+            >
+              Movies
+            </button>
+            <button
+              onClick={() => {
+                setMediaType('tv');
+              }}
+              className={
+                mediaType === 'tv'
+                  ? 'bg-green-400 rounded-lg pl-2.5 pr-2.5'
+                  : 'bg-white rounded-lg pl-2.5 pr-2.5'
+              }
+            >
+              TV shows
+            </button>
+            <button
+              onClick={() => {
+                setMediaType('person');
+              }}
+              className={
+                mediaType === 'person'
+                  ? 'bg-green-400 rounded-lg pl-2.5 pr-2.5'
+                  : 'bg-white rounded-lg pl-2.5 pr-2.5'
+              }
+            >
+              People
+            </button>
+          </div>
         </div>
         <div className="flex w-full overflow-x-scroll transition-all">
-          {trendingMovies &&
-            trendingMovies.map(
-              (object: { poster_path?: string; id?: number }) => (
-                <Link to={`movie/${object.id}`}>
-                  <div className="w-44 flex-shrink-0 pr-3">
-                    <img
-                      className="rounded-lg object-fill "
-                      src={urlForImageFetch + object.poster_path}
-                      alt=""
-                    />
-                  </div>
-                </Link>
-              )
-            )}
+          {trending &&
+            trending.map((object: { poster_path?: string; id?: number }) => (
+              <Link to={`${mediaType}/${object.id}`}>
+                <div className="w-44 flex-shrink-0 pr-3">
+                  <img
+                    className="rounded-lg object-fill "
+                    src={urlForImageFetch + object.poster_path}
+                    alt=""
+                  />
+                </div>
+              </Link>
+            ))}
         </div>
         <p className="text-white text-4xl">Top Rated</p>
         <div className="flex w-full overflow-x-scroll">
-          {topRatedMovies &&
-            topRatedMovies.map(
-              (object: { poster_path?: string; id?: number }) => (
-                <Link to={`movie/${object.id}`}>
-                  <div className="w-44 flex-shrink-0 pr-3">
-                    <img
-                      className="rounded-lg object-fill "
-                      src={urlForImageFetch + object.poster_path}
-                      alt=""
-                    />
-                  </div>
-                </Link>
-              )
-            )}
+          {topRated &&
+            topRated.map((object: { poster_path?: string; id?: number }) => (
+              <Link to={`movie/${object.id}`}>
+                <div className="w-44 flex-shrink-0 pr-3">
+                  <img
+                    className="rounded-lg object-fill "
+                    src={urlForImageFetch + object.poster_path}
+                    alt=""
+                  />
+                </div>
+              </Link>
+            ))}
         </div>
         <p className="text-white text-4xl">Popular Actors</p>
         <div className="flex w-full overflow-x-scroll">

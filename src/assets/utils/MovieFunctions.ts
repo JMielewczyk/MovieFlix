@@ -3,6 +3,7 @@ const urlToApi = 'https://api.themoviedb.org/3';
 const urlForImage = 'https://image.tmdb.org/t/p/original';
 
 export const getPosters = async (
+  mediatype: string | undefined,
   movieid: string | undefined,
   maxPostersVisible: number,
   setLoadMorePostersBtn: React.Dispatch<React.SetStateAction<boolean>>,
@@ -16,7 +17,7 @@ export const getPosters = async (
   >
 ) => {
   const res = await fetch(
-    `${urlToApi}/movie/${movieid}/images?api_key=${API_KEY}`
+    `${urlToApi}/${mediatype}/${movieid}/images?api_key=${API_KEY}`
   );
   const data = await res.json();
   if (data.posters.length >= maxPostersVisible) {

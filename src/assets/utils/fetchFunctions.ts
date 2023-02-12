@@ -2,14 +2,10 @@ const API_KEY = import.meta.env.VITE_API_KEY;
 const urlToApi = 'https://api.themoviedb.org/3';
 const urlForImageFetch = 'https://image.tmdb.org/t/p/original';
 
-export const getTrendingToday = async () => {
-  const res = await fetch(`${urlToApi}/trending/all/day?api_key=${API_KEY}`);
-  const data = await res.json();
-  return data;
-};
-
-export const getTrendingWeekly = async () => {
-  const res = await fetch(`${urlToApi}/trending/all/week?api_key=${API_KEY}`);
+export const getTrending = async (mediaType: string, time: string) => {
+  const res = await fetch(
+    `${urlToApi}/trending/${mediaType}/${time}?api_key=${API_KEY}`
+  );
   const data = await res.json();
   return data;
 };
@@ -23,15 +19,18 @@ export const getAllGenres = async () => {
 export const loadFeatured = async (
   setFeaturedMovieImage: React.Dispatch<React.SetStateAction<string>>,
   setFeaturedMovieID: React.Dispatch<React.SetStateAction<string>>,
-  setGenres: React.Dispatch<React.SetStateAction<string[]>>
+  setGenres: React.Dispatch<React.SetStateAction<string[]>>,
+  mediaType: string,
+  timeWindow: string
 ) => {
-  const trendingMovies = await getTrendingToday();
-  const featuredMovie = trendingMovies.results[0];
-  const mostPopularMovieImage = urlForImageFetch + featuredMovie.poster_path;
-  setFeaturedMovieImage(mostPopularMovieImage);
-  setFeaturedMovieID(featuredMovie.id);
+  if (mediaType !== 'movie' && mediaType !== 'tv') return;
+  const trending = await getTrending(mediaType, timeWindow);
+  const featured = trending.results[0];
+  const poster = urlForImageFetch + featured.poster_path;
+  setFeaturedMovieImage(poster);
+  setFeaturedMovieID(featured.id);
   const genresIds: Array<{ id: number; name: string }> = await getAllGenres();
-  const featuredMovieGenresIds: number[] = featuredMovie.genre_ids;
+  const featuredMovieGenresIds: number[] = featured.genre_ids;
   let featuredMovieGenresNames: string[] = [];
   for (const object of genresIds) {
     if (featuredMovieGenresNames.length < 3) {
@@ -46,24 +45,22 @@ export const loadFeatured = async (
 };
 
 export const loadTrending = async (
-  setTrendingMoviesToday: React.Dispatch<React.SetStateAction<Object[] | null>>,
-  setTrendingMovies: React.Dispatch<React.SetStateAction<Object[] | null>>,
-  setButtonToday: React.Dispatch<React.SetStateAction<boolean>>,
-  setTrendingMoviesWeekly: React.Dispatch<React.SetStateAction<Object[] | null>>
+  setTrending: React.Dispatch<React.SetStateAction<Object[] | null>>,
+  mediaType: string,
+  timeWindow: string
 ) => {
-  const trendingMoviesToday = await getTrendingToday();
-  setTrendingMoviesToday(trendingMoviesToday.results);
-  setTrendingMovies(trendingMoviesToday.results);
-  setButtonToday(true);
-  const trendingMoviesWeekly = await getTrendingWeekly();
-  setTrendingMoviesWeekly(trendingMoviesWeekly.results);
+  const trending = await getTrending(mediaType, timeWindow);
+  setTrending(trending.results);
 };
 export const loadTopRated = async (
-  setTopRatedMovies: React.Dispatch<React.SetStateAction<Object[] | null>>
+  setTopRated: React.Dispatch<React.SetStateAction<Object[] | null>>,
+  mediaType: string
 ) => {
-  const res = await fetch(`${urlToApi}/movie/top_rated?api_key=${API_KEY}`);
+  const res = await fetch(
+    `${urlToApi}/${mediaType}/top_rated?api_key=${API_KEY}`
+  );
   const data = await res.json();
-  setTopRatedMovies(data.results);
+  setTopRated(data.results);
 };
 export const loadPopularActors = async (
   setActors: React.Dispatch<React.SetStateAction<Object[] | null>>

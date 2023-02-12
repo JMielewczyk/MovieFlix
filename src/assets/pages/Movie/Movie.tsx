@@ -10,6 +10,7 @@ const Movie = () => {
   const [releaseYear, setReleaseYear] = useState<string>('');
   const [fullRelease, setFullRelease] = useState<string>('');
   const [voteAverage, setVoteAverage] = useState<number>(0);
+  const [voteCount, setVoteCount] = useState<number>(0);
   const [movieHomepage, setMovieHomepage] = useState<string>('');
   const [runtime, setRuntime] = useState<string>('');
   const [genres, setGenres] = useState<Object[]>([]);
@@ -29,33 +30,47 @@ const Movie = () => {
   const [maxVideosVisible, setMaxVideosVisible] = useState<number>(5);
   const API_KEY = import.meta.env.VITE_API_KEY;
   const urlToApi = 'https://api.themoviedb.org/3';
-
+  const { mediatype } = useParams();
   useEffect(() => {
     const getDetails = async () => {
       const res = await fetch(
-        `${urlToApi}/movie/${movieid}?api_key=${API_KEY}`
+        `${urlToApi}/${mediatype}/${movieid}?api_key=${API_KEY}`
       );
       const data = await res.json();
       setHeaderImage(`${urlForImage}${data.backdrop_path}`);
       setPosterHeader(`${urlForImage}${data.poster_path}`);
-      console.log(data);
-      setTitle(data.title);
-      const date = new Date(data.release_date);
-      const year = date.getFullYear().toString();
-      setReleaseYear(year);
-      setFullRelease(data.release_date);
-      const runtime = data.runtime;
-      const hours = Math.floor(runtime / 60);
-      const minutes = runtime % 60;
-      const hoursAndMinutes = `${hours}h ${minutes}m`;
-      setRuntime(hoursAndMinutes);
+      if (mediatype === 'tv') {
+        setTitle(data.original_name);
+        const date = new Date(data.first_air_date);
+        const year = date.getFullYear().toString();
+        setReleaseYear(year);
+        setFullRelease(data.first_air_date);
+        const runtime = data.episode_run_time;
+        const hours = Math.floor(runtime / 60);
+        const minutes = runtime % 60;
+        const hoursAndMinutes = `${hours < 1 ? ' ' : hours + 'h'} ${minutes}m`;
+        setRuntime(`Episode time: ${hoursAndMinutes}`);
+      } else if (mediatype === 'movie') {
+        setTitle(data.title);
+        const date = new Date(data.release_date);
+        const year = date.getFullYear().toString();
+        setReleaseYear(year);
+        setFullRelease(data.release_date);
+        const runtime = data.runtime;
+        const hours = Math.floor(runtime / 60);
+        const minutes = runtime % 60;
+        const hoursAndMinutes = `${hours < 1 ? ' ' : hours + 'h'} ${minutes}m`;
+        setRuntime(hoursAndMinutes);
+      }
+
       setVoteAverage(data.vote_average.toFixed(1));
+      setVoteCount(data.vote_count);
       setMovieHomepage(data.homepage);
       setGenres(data.genres);
       setTagline(data.tagline);
       setOverview(data.overview);
       const creditsRes = await fetch(
-        `${urlToApi}/movie/${movieid}/credits?api_key=${API_KEY}`
+        `${urlToApi}/${mediatype}/${movieid}/credits?api_key=${API_KEY}`
       );
       const creditsData = await creditsRes.json();
       const director = creditsData.crew.filter(
@@ -65,12 +80,24 @@ const Movie = () => {
       setCast(creditsData.cast);
     };
     getDetails();
-    getPosters(movieid, maxPostersVisible, setLoadMorePostersBtn, setImages);
+    getPosters(
+      mediatype,
+      movieid,
+      maxPostersVisible,
+      setLoadMorePostersBtn,
+      setImages
+    );
     getVideos(movieid, maxVideosVisible, setLoadMoreVideosBtn, setVideos);
   }, []);
 
   useEffect(() => {
-    getPosters(movieid, maxPostersVisible, setLoadMorePostersBtn, setImages);
+    getPosters(
+      mediatype,
+      movieid,
+      maxPostersVisible,
+      setLoadMorePostersBtn,
+      setImages
+    );
   }, [maxPostersVisible]);
 
   useEffect(() => {
@@ -79,7 +106,7 @@ const Movie = () => {
 
   const windowWidth = window.innerWidth - 50;
   const windowHeight = windowWidth * (3 / 4);
-  console.log(cast);
+
   return (
     <div className="flex flex-col w-screen min-h-screen overflow-hidden pl-5 pr-5 bg-black gap-7">
       <header className="w-full h-1/4 relative overflow-hidden rounded-lg ">
@@ -109,6 +136,7 @@ const Movie = () => {
             </Link>
           </div>
         </div>
+        <p className="text-white">Votes: {voteCount}</p>
         <div className="flex flex-wrap items-center justify-center gap-1 border-2">
           <span className="text-white">{fullRelease}</span>
           <BsDot className="text-white" />
