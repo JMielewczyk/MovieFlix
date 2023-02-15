@@ -1,26 +1,19 @@
 import { useEffect, useState } from 'react';
 import { AiOutlinePlayCircle } from 'react-icons/ai';
 import { BsDot, BsFillArrowRightCircleFill } from 'react-icons/bs';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { getPosters, getVideos } from '../../utils/MovieFunctions';
 import { FaRegSadCry } from 'react-icons/fa';
+import { IdataDetails } from './interfaces';
 
 const Movie = () => {
-  const [title, setTitle] = useState<string>('');
-  const [releaseYear, setReleaseYear] = useState<string>('');
-  const [fullRelease, setFullRelease] = useState<string>('');
-  const [voteAverage, setVoteAverage] = useState<number>(0);
-  const [voteCount, setVoteCount] = useState<number>(0);
-  const [movieHomepage, setMovieHomepage] = useState<string>('');
   const [runtime, setRuntime] = useState<string>('');
+  const [dataDetails, setDataDetails] = useState<IdataDetails>([]);
+  const [fullRelease, setFullRelease] = useState<string>('');
   const [genres, setGenres] = useState<Object[]>([]);
-  const [tagline, setTagline] = useState<string>('');
-  const [overview, setOverview] = useState<string>('');
   const [director, setDirector] = useState<Object[]>([]);
   const [cast, setCast] = useState<Object[]>([]);
   const [images, setImages] = useState<null | { file_path?: string }[]>(null);
-  const [headerImage, setHeaderImage] = useState<string>('');
-  const [posterHeader, setPosterHeader] = useState<string>('');
   const [videos, setVideos] = useState<null | { key?: string }[]>(null);
   const [loadMorePostersBtn, setLoadMorePostersBtn] = useState(false);
   const [loadMoreVideosBtn, setLoadMoreVideosBtn] = useState(false);
@@ -36,39 +29,31 @@ const Movie = () => {
       const res = await fetch(
         `${urlToApi}/${mediatype}/${movieid}?api_key=${API_KEY}`
       );
-      const data = await res.json();
-      setHeaderImage(`${urlForImage}${data.backdrop_path}`);
-      setPosterHeader(`${urlForImage}${data.poster_path}`);
+      const dataDetails = await res.json();
+      setDataDetails(dataDetails);
+      setGenres(dataDetails.genres);
       if (mediatype === 'tv') {
-        setTitle(data.original_name);
-        const date = new Date(data.first_air_date);
-        const year = date.getFullYear().toString();
-        setReleaseYear(year);
-        setFullRelease(data.first_air_date);
-        const runtime = data.episode_run_time;
+        const runtime = dataDetails.episode_run_time;
         const hours = Math.floor(runtime / 60);
         const minutes = runtime % 60;
         const hoursAndMinutes = `${hours < 1 ? ' ' : hours + 'h'} ${minutes}m`;
+        if (isNaN(hours) || isNaN(minutes)) return;
         setRuntime(`Episode time: ${hoursAndMinutes}`);
+        const fullRelease = new Date(dataDetails.first_air_date)
+          .getFullYear()
+          .toString();
+        setFullRelease(fullRelease);
       } else if (mediatype === 'movie') {
-        setTitle(data.title);
-        const date = new Date(data.release_date);
-        const year = date.getFullYear().toString();
-        setReleaseYear(year);
-        setFullRelease(data.release_date);
-        const runtime = data.runtime;
+        const runtime = dataDetails.runtime;
         const hours = Math.floor(runtime / 60);
         const minutes = runtime % 60;
         const hoursAndMinutes = `${hours < 1 ? ' ' : hours + 'h'} ${minutes}m`;
         setRuntime(hoursAndMinutes);
+        const fullRelease = new Date(dataDetails.release_date)
+          .getFullYear()
+          .toString();
+        setFullRelease(fullRelease);
       }
-
-      setVoteAverage(data.vote_average.toFixed(1));
-      setVoteCount(data.vote_count);
-      setMovieHomepage(data.homepage);
-      setGenres(data.genres);
-      setTagline(data.tagline);
-      setOverview(data.overview);
       const creditsRes = await fetch(
         `${urlToApi}/${mediatype}/${movieid}/credits?api_key=${API_KEY}`
       );
@@ -107,39 +92,74 @@ const Movie = () => {
   const windowWidth = window.innerWidth - 50;
   const windowHeight = windowWidth * (3 / 4);
 
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  }, [location.pathname]);
+
   return (
     <div className="flex flex-col w-screen min-h-screen overflow-hidden pl-5 pr-5 bg-black gap-7">
       <header className="w-full h-1/4 relative overflow-hidden rounded-lg ">
         <div className="absolute h-full w-48 from-black via-black bg-gradient-to-r"></div>
         <div className="absolute h-full flex justify-start items-center">
-          {posterHeader && (
-            <img className="rounded-lg h-3/4" src={posterHeader} alt="" />
+          {dataDetails.poster_path && (
+            <img
+              className="rounded-lg h-3/4"
+              src={`${urlForImage}${dataDetails.poster_path}`}
+              alt=""
+            />
           )}
         </div>
-        {headerImage && (
-          <img className="ml-2.5 rounded-lg" src={headerImage}></img>
+        {dataDetails.backdrop_path && (
+          <img
+            className="ml-2.5 rounded-lg"
+            src={`${urlForImage}${dataDetails.backdrop_path}`}
+          ></img>
         )}
       </header>
       <main className="flex flex-col w-full gap-6">
         <div className="w-full  ">
-          <h1 className="text-white text-center text-3xl">{`${title} (${releaseYear})`}</h1>
+          <h1 className="text-white text-center text-3xl">
+            {dataDetails.original_name
+              ? dataDetails.original_name
+              : dataDetails.original_title}
+            {` (${fullRelease})`}
+          </h1>
         </div>
         <div className="flex gap-2.5">
           <div className="w-full">
-            <p className="text-white">Community Score: {voteAverage}/10</p>
+            <p className="text-white">Community Score:</p>
+            <p className="text-white">
+              {dataDetails.vote_average && dataDetails.vote_average.toFixed(1)}
+              /10
+            </p>
           </div>
           <div className="w-full pl-10">
-            <Link to={movieHomepage}>
+            <Link
+              to={
+                dataDetails.homepage !== undefined ? dataDetails.homepage : ' '
+              }
+            >
               <button className="text-xl bg-white w-full h-full rounded-lg flex justify-center items-center gap-2.5">
                 Watch <AiOutlinePlayCircle className="text-xl" />
               </button>
             </Link>
           </div>
         </div>
-        <p className="text-white">Votes: {voteCount}</p>
+        <p className="text-white">
+          Votes: {dataDetails.vote_count && dataDetails.vote_count}
+        </p>
         <div className="flex flex-wrap items-center justify-center gap-1 border-2">
-          <span className="text-white">{fullRelease}</span>
-          <BsDot className="text-white" />
+          <span className="text-white">
+            {dataDetails.first_air_date
+              ? dataDetails.first_air_date
+              : dataDetails.release_date}
+          </span>
+          {runtime === '' ? null : <BsDot className="text-white" />}
           <span className="text-white">{runtime}</span>
           <div className="w-full text-center">
             {genres &&
@@ -152,9 +172,9 @@ const Movie = () => {
               })}
           </div>
         </div>
-        <p className="text-slate-400 italic">{tagline}</p>
+        <p className="text-slate-400 italic">{dataDetails.tagline}</p>
         <p className="text-3xl text-white">Description</p>
-        <p className="text-white">{overview}</p>
+        <p className="text-white">{dataDetails.overview}</p>
         {director &&
           director.map((object: { original_name?: string; job?: string }) => {
             return (
@@ -172,30 +192,35 @@ const Movie = () => {
                 profile_path?: string | null;
                 name?: string;
                 character?: string;
+                id?: string;
               }) => {
                 return (
-                  <div className="flex flex-col justify-between w-44 border-2  flex-shrink-0 mr-3 rounded-lg">
-                    {typeof object.profile_path === 'string' ? (
-                      <img
-                        className="object-cover"
-                        src={`${urlForImage}${object.profile_path}`}
-                        alt=""
-                      />
-                    ) : (
-                      <div className="flex flex-col justify-center gap-5 items-center w-full h-3/4 mb-2">
-                        <p className="text-white text-center">
-                          Sorry, no image for this person
+                  <Link to={`/actors/${object.id}`}>
+                    <div className="flex flex-col min-h-full justify-between w-44 border-2 flex-shrink-0 mr-3 rounded-lg">
+                      {typeof object.profile_path === 'string' ? (
+                        <img
+                          className="object-cover rounded-t-lg"
+                          src={`${urlForImage}${object.profile_path}`}
+                          alt=""
+                        />
+                      ) : (
+                        <div className="flex flex-col flex-grow justify-center gap-5 items-center w-full pt-20 mb-10">
+                          <p className="text-white text-center">
+                            Sorry, no image for this person
+                          </p>
+                          <FaRegSadCry className="text-white text-5xl" />
+                        </div>
+                      )}
+                      <div className="w-full flex flex-grow flex-col justify-center items-center">
+                        <p className="text-white font-bold text-center">
+                          {object.name}
                         </p>
-                        <FaRegSadCry className="text-white text-5xl" />
+                        <p className="text-white font-light text-center">
+                          {object.character}
+                        </p>
                       </div>
-                    )}
-                    <div className="w-full flex flex-grow flex-col justify-center items-center">
-                      <p className="text-white font-bold">{object.name}</p>
-                      <p className="text-white font-light">
-                        {object.character}
-                      </p>
                     </div>
-                  </div>
+                  </Link>
                 );
               }
             )}

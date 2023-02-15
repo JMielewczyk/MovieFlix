@@ -42,6 +42,7 @@ const Home = () => {
     loadTrending(setTrending, mediaType, timeWindow);
     loadTopRated(setTopRated, mediaType);
   }, [mediaType, timeWindow]);
+
   return (
     <div className="flex flex-col w-screen min-h-screen bg-black gap-10 overflow-x-hidden">
       <header className="w-screen h-4/5 pl-5 pr-5">
@@ -52,8 +53,8 @@ const Home = () => {
             alt=" "
           />
           <Link
-            to={`movie/${featuredMovieID}`}
-            className="absolute top-0 w-full h-3/4"
+            to={`${mediaType}/${featuredMovieID}`}
+            className="absolute top-0 w-full h-5/6"
           ></Link>
           <div className="absolute flex-col flex-wrap bottom-0 w-full flex h-1/5 justify-evenly items-center pr-5 pl-5 backdrop-blur-sm">
             <div className="flex flex-row justify-evenly w-full items-center">

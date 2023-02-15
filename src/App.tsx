@@ -1,5 +1,12 @@
 import { useState } from 'react';
-import { HashRouter, Link, NavLink, Route, Routes } from 'react-router-dom';
+import {
+  HashRouter,
+  Link,
+  NavLink,
+  Route,
+  Routes,
+  useLocation,
+} from 'react-router-dom';
 import { AiOutlineMenu } from 'react-icons/ai';
 import { ImCross } from 'react-icons/im';
 
@@ -60,7 +67,6 @@ function App() {
         <div className="w-screen bg-black pt-20">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/:mediatype/:movieid" element={<Movie />} />
             <Route path="/:mediatype/:movieid" element={<Movie />} />
             <Route path="/actors/:actorid" element={<Actors />} />
           </Routes>
