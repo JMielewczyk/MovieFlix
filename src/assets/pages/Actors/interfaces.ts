@@ -23,6 +23,7 @@ export interface ICredits {
   release_date?: string;
   first_air_date?: string;
   original_name?: string;
+  name?: string;
 }
 
 export interface ICredits extends Array<ICredits> {}

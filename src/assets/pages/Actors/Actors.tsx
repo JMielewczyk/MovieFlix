@@ -5,14 +5,14 @@ import {
   AiOutlineFacebook,
   AiOutlineInstagram,
 } from 'react-icons/ai';
+import { BsFillArrowRightCircleFill } from 'react-icons/bs';
 import { FaRegSadCry } from 'react-icons/fa';
 import { Link, useLocation, useParams } from 'react-router-dom';
+import { getDetails, getExternal, loadMoviesAndTV } from './features';
 import { ICredits, IdataDetails, Iexternal } from './interfaces';
 
 const Actors = () => {
-  const urlToApi = 'https://api.themoviedb.org/3';
   const urlForImage = 'https://image.tmdb.org/t/p/original';
-  const API_KEY = import.meta.env.VITE_API_KEY;
   const { actorid } = useParams();
   const [dataDetails, setDataDetails] = useState<IdataDetails>([]);
   const [yearsOld, setYearsOld] = useState<number>(0);
@@ -24,118 +24,65 @@ const Actors = () => {
   const [fullBiography, setFullBiography] = useState(false);
   const [fullMovieTimeline, setFullMovieTimeline] = useState(false);
   const [fullTVTimeline, setFullTVTimeline] = useState(false);
+  const [loadMoreMoviesBtn, setLoadMoreMoviesBtn] = useState(false);
+  const [maxMoviesVisible, setMaxMoviesVisible] = useState(10);
+  const [loadMoreTVBtn, setLoadMoreTVBtn] = useState(false);
+  const [maxTVVisible, setMaxTVVisible] = useState(10);
+  const [type, setType] = useState(' ');
 
   const location = useLocation();
 
   useEffect(() => {
-    const getDetails = async () => {
-      const resDetails = await fetch(
-        `${urlToApi}/person/${actorid}?api_key=${API_KEY}`
-      );
-      const dataDetails = await resDetails.json();
-      setDataDetails(dataDetails);
-
-      const dateNow = dataDetails.deathday
-        ? new Date(dataDetails.deathday).getTime()
-        : new Date().getTime();
-      const birthDate = new Date(dataDetails.birthday).getTime();
-      let yearsOld = Math.floor(
-        (dateNow - birthDate) / (1000 * 60 * 60 * 24 * 365.25)
-      );
-      setYearsOld(yearsOld);
-      const resExternal = await fetch(
-        `${urlToApi}/person/${actorid}/external_ids?api_key=${API_KEY}`
-      );
-      const dataExternal = await resExternal.json();
-      setExternal(dataExternal);
-
-      const loadMoviesAndTV = async (type: string) => {
-        const resCredits = await fetch(
-          `${urlToApi}/person/${actorid}/${type}?api_key=${API_KEY}`
-        );
-        const dataCredits = await resCredits.json();
-        const sortedByPopularity = dataCredits.cast.sort(
-          (a: { popularity: number }, b: { popularity: number }) =>
-            b.popularity - a.popularity
-        );
-
-        const popularOnlyReleased = sortedByPopularity.filter(
-          (object: { release_date?: string; first_air_date?: string }) => {
-            if (object.release_date) {
-              const releaseDate = new Date(object.release_date);
-              const nowDate = new Date();
-              return releaseDate < nowDate;
-            } else if (object.first_air_date) {
-              const releaseDate = new Date(object.first_air_date);
-              const nowDate = new Date();
-              return releaseDate < nowDate;
-            }
-          }
-        );
-        const sortedByDate = dataCredits.cast.sort(
-          (
-            a: { release_date?: string; first_air_date?: string },
-            b: { release_date?: string; first_air_date?: string }
-          ) => {
-            if (a.release_date && b.release_date) {
-              return (
-                (new Date(b.release_date) as any) -
-                (new Date(a.release_date) as any)
-              );
-            } else if (a.first_air_date && b.first_air_date) {
-              return (
-                (new Date(b.first_air_date) as any) -
-                (new Date(a.first_air_date) as any)
-              );
-            }
-          }
-        );
-        const byDateOnlyReleased = sortedByDate.filter(
-          (object: { release_date?: string; first_air_date?: string }) => {
-            if (object.release_date) {
-              const nowDate = new Date();
-              const movieDate = new Date(object.release_date);
-              return nowDate > movieDate;
-            } else if (object.first_air_date) {
-              const nowDate = new Date();
-              const movieDate = new Date(object.first_air_date);
-              return nowDate > movieDate;
-            }
-          }
-        );
-        const onlyYear = byDateOnlyReleased.map(
-          (object: { release_date?: any; first_air_date?: any }) => {
-            if (object.release_date) {
-              object.release_date = new Date(object.release_date).getFullYear();
-              return object;
-            } else if (object.first_air_date) {
-              object.first_air_date = new Date(
-                object.first_air_date
-              ).getFullYear();
-              return object;
-            }
-          }
-        );
-        if (type === 'movie_credits') {
-          setMovieCredits(popularOnlyReleased);
-          setMovieTimeline(onlyYear);
-        } else if (type === 'tv_credits') {
-          setTVCredits(popularOnlyReleased);
-          setTVTimeline(onlyYear);
-        }
-      };
-      loadMoviesAndTV('movie_credits');
-      loadMoviesAndTV('tv_credits');
-    };
-    getDetails();
+    getDetails(actorid, setDataDetails, setYearsOld);
+    getExternal(actorid, setExternal);
+    loadMoviesAndTV(
+      'movie_credits',
+      actorid,
+      setMovieCredits,
+      setMovieTimeline,
+      setTVCredits,
+      setTVTimeline,
+      maxMoviesVisible,
+      maxTVVisible,
+      setLoadMoreMoviesBtn,
+      setLoadMoreTVBtn
+    );
+    loadMoviesAndTV(
+      'tv_credits',
+      actorid,
+      setMovieCredits,
+      setMovieTimeline,
+      setTVCredits,
+      setTVTimeline,
+      maxMoviesVisible,
+      maxTVVisible,
+      setLoadMoreMoviesBtn,
+      setLoadMoreTVBtn
+    );
   }, []);
+
   useEffect(() => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth',
     });
   }, [location.pathname]);
-  console.log(tvTimeline);
+
+  useEffect(() => {
+    loadMoviesAndTV(
+      type,
+      actorid,
+      setMovieCredits,
+      setMovieTimeline,
+      setTVCredits,
+      setTVTimeline,
+      maxMoviesVisible,
+      maxTVVisible,
+      setLoadMoreMoviesBtn,
+      setLoadMoreTVBtn
+    );
+  }, [maxMoviesVisible, maxTVVisible]);
+
   return (
     <div className="flex flex-col w-screen min-h-screen overflow-hidden pl-5 pr-5 bg-black gap-7">
       <header className="w-full h-4/5 flex flex-col gap-2.5">
@@ -251,11 +198,26 @@ const Actors = () => {
                       </div>
                     )}
                     <div className="w-full flex-grow flex justify-center items-center">
-                      <p className="text-white font-bold">{object.title}</p>
+                      <p className="text-white font-bold text-center">
+                        {object.title}
+                      </p>
                     </div>
                   </div>
                 </Link>
               ))}
+            {loadMoreMoviesBtn && (
+              <div className="flex justify-center items-center">
+                <BsFillArrowRightCircleFill
+                  onClick={() => {
+                    let maxNumber = maxMoviesVisible;
+                    maxNumber += 10;
+                    setType('movie_credits');
+                    setMaxMoviesVisible(maxNumber);
+                  }}
+                  className="text-white text-5xl"
+                />
+              </div>
+            )}
           </div>
         </div>
         <div className="flex flex-col w-full overflow-x-scroll transition-all gap-2.5">
@@ -280,11 +242,26 @@ const Actors = () => {
                       </div>
                     )}
                     <div className="w-full flex-grow flex justify-center items-center">
-                      <p className="text-white font-bold">{object.title}</p>
+                      <p className="text-white font-bold text-center">
+                        {object.name}
+                      </p>
                     </div>
                   </div>
                 </Link>
               ))}
+            {loadMoreTVBtn && (
+              <div className="flex justify-center items-center">
+                <BsFillArrowRightCircleFill
+                  onClick={() => {
+                    let maxNumber = maxTVVisible;
+                    maxNumber += 10;
+                    setType('tv_credits');
+                    setMaxTVVisible(maxNumber);
+                  }}
+                  className="text-white text-5xl"
+                />
+              </div>
+            )}
           </div>
         </div>
         <div className="flex flex-col gap-2.5">

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { AiOutlinePlayCircle } from 'react-icons/ai';
 import { BsDot, BsFillArrowRightCircleFill } from 'react-icons/bs';
 import { Link, useLocation, useParams } from 'react-router-dom';
-import { getPosters, getVideos } from '../../utils/MovieFunctions';
+import { getCredits, getDetails, getPosters, getVideos } from './features';
 import { FaRegSadCry } from 'react-icons/fa';
 import { IdataDetails } from './interfaces';
 
@@ -15,56 +15,32 @@ const Movie = () => {
   const [cast, setCast] = useState<Object[]>([]);
   const [images, setImages] = useState<null | { file_path?: string }[]>(null);
   const [videos, setVideos] = useState<null | { key?: string }[]>(null);
+  const [loadMoreCastBtn, setLoadMoreCastBtn] = useState(false);
   const [loadMorePostersBtn, setLoadMorePostersBtn] = useState(false);
   const [loadMoreVideosBtn, setLoadMoreVideosBtn] = useState(false);
-  const { movieid } = useParams();
-  const urlForImage = 'https://image.tmdb.org/t/p/original';
-  const [maxPostersVisible, setMaxPostersVisible] = useState<number>(20);
+  const [maxCastVisible, setMaxCastVisible] = useState<number>(10);
+  const [maxPostersVisible, setMaxPostersVisible] = useState<number>(10);
   const [maxVideosVisible, setMaxVideosVisible] = useState<number>(5);
-  const API_KEY = import.meta.env.VITE_API_KEY;
-  const urlToApi = 'https://api.themoviedb.org/3';
+  const { movieid } = useParams();
   const { mediatype } = useParams();
+  const urlForImage = 'https://image.tmdb.org/t/p/original';
   useEffect(() => {
-    const getDetails = async () => {
-      const res = await fetch(
-        `${urlToApi}/${mediatype}/${movieid}?api_key=${API_KEY}`
-      );
-      const dataDetails = await res.json();
-      setDataDetails(dataDetails);
-      setGenres(dataDetails.genres);
-      if (mediatype === 'tv') {
-        const runtime = dataDetails.episode_run_time;
-        const hours = Math.floor(runtime / 60);
-        const minutes = runtime % 60;
-        const hoursAndMinutes = `${hours < 1 ? ' ' : hours + 'h'} ${minutes}m`;
-        if (isNaN(hours) || isNaN(minutes)) return;
-        setRuntime(`Episode time: ${hoursAndMinutes}`);
-        const fullRelease = new Date(dataDetails.first_air_date)
-          .getFullYear()
-          .toString();
-        setFullRelease(fullRelease);
-      } else if (mediatype === 'movie') {
-        const runtime = dataDetails.runtime;
-        const hours = Math.floor(runtime / 60);
-        const minutes = runtime % 60;
-        const hoursAndMinutes = `${hours < 1 ? ' ' : hours + 'h'} ${minutes}m`;
-        setRuntime(hoursAndMinutes);
-        const fullRelease = new Date(dataDetails.release_date)
-          .getFullYear()
-          .toString();
-        setFullRelease(fullRelease);
-      }
-      const creditsRes = await fetch(
-        `${urlToApi}/${mediatype}/${movieid}/credits?api_key=${API_KEY}`
-      );
-      const creditsData = await creditsRes.json();
-      const director = creditsData.crew.filter(
-        (object: { job?: string }) => object.job === 'Director'
-      );
-      setDirector(director);
-      setCast(creditsData.cast);
-    };
-    getDetails();
+    getDetails(
+      mediatype,
+      movieid,
+      setDataDetails,
+      setGenres,
+      setRuntime,
+      setFullRelease
+    );
+    getCredits(
+      mediatype,
+      movieid,
+      setDirector,
+      setCast,
+      maxCastVisible,
+      setLoadMoreCastBtn
+    );
     getPosters(
       mediatype,
       movieid,
@@ -88,6 +64,17 @@ const Movie = () => {
   useEffect(() => {
     getVideos(movieid, maxVideosVisible, setLoadMoreVideosBtn, setVideos);
   }, [maxVideosVisible]);
+
+  useEffect(() => {
+    getCredits(
+      mediatype,
+      movieid,
+      setDirector,
+      setCast,
+      maxCastVisible,
+      setLoadMoreCastBtn
+    );
+  }, [maxCastVisible]);
 
   const windowWidth = window.innerWidth - 50;
   const windowHeight = windowWidth * (3 / 4);
@@ -224,6 +211,18 @@ const Movie = () => {
                 );
               }
             )}
+          {loadMoreCastBtn && (
+            <div className="flex justify-center items-center">
+              <BsFillArrowRightCircleFill
+                onClick={() => {
+                  let maxNumber = maxCastVisible;
+                  maxNumber += 10;
+                  setMaxCastVisible(maxNumber);
+                }}
+                className="text-white text-5xl"
+              />
+            </div>
+          )}
         </div>
         <div className="flex flex-col w-full">
           {videos !== null && videos.length > 0 ? (
@@ -273,7 +272,7 @@ const Movie = () => {
               <BsFillArrowRightCircleFill
                 onClick={() => {
                   let maxNumber = maxPostersVisible;
-                  maxNumber += 20;
+                  maxNumber += 10;
                   setMaxPostersVisible(maxNumber);
                 }}
                 className="text-white text-5xl"
