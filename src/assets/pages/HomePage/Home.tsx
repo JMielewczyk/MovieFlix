@@ -194,7 +194,7 @@ const Home = () => {
                 name?: string;
                 id?: number;
               }) => (
-                <Link to={`actors/${object.id}`}>
+                <Link to={`person/${object.id}`}>
                   <div className="flex flex-col gap-1">
                     <div className="w-44 flex-shrink-0 pr-3 relative">
                       <img

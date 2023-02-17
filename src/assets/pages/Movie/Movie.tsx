@@ -182,7 +182,7 @@ const Movie = () => {
                 id?: string;
               }) => {
                 return (
-                  <Link to={`/actors/${object.id}`}>
+                  <Link to={`/person/${object.id}`}>
                     <div className="flex flex-col min-h-full justify-between w-44 border-2 flex-shrink-0 mr-3 rounded-lg">
                       {typeof object.profile_path === 'string' ? (
                         <img

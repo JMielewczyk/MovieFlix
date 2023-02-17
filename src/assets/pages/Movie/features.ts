@@ -2,7 +2,6 @@ import { IdataDetails } from './interfaces';
 
 const API_KEY = import.meta.env.VITE_API_KEY;
 const urlToApi = 'https://api.themoviedb.org/3';
-const urlForImage = 'https://image.tmdb.org/t/p/original';
 
 export const getPosters = async (
   mediatype: string | undefined,
