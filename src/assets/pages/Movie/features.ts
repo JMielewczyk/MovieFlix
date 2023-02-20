@@ -106,7 +106,6 @@ export const getCredits = async (
   maxCastVisible: number,
   setLoadMoreCastBtn: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  console.log('working');
   const creditsRes = await fetch(
     `${urlToApi}/${mediatype}/${movieid}/credits?api_key=${API_KEY}`
   );
