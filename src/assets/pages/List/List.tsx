@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { AiOutlineArrowRight } from 'react-icons/ai';
 import { BsArrowDownCircle } from 'react-icons/bs';
 import { Link, useParams } from 'react-router-dom';
 import { IdataObject } from './interfaces';

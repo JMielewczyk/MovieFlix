@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState, createContext } from 'react';
 import { HashRouter, Link, NavLink, Route, Routes } from 'react-router-dom';
 import { AiOutlineMenu } from 'react-icons/ai';
 import { ImCross } from 'react-icons/im';
@@ -7,12 +7,15 @@ import Home from './assets/pages/HomePage/Home';
 import Movie from './assets/pages/Movie/Movie';
 import Actors from './assets/pages/Actors/Actors';
 import List from './assets/pages/List/List';
+import Search from './assets/pages/Search/Search';
 
 function App() {
   const [isAsideOpen, setIsAsideOpen] = useState(false);
   const [moviesCategories, setMoviesCategories] = useState(false);
   const [tvCategories, setTVCategories] = useState(false);
   const [peopleActive, setPeopleActive] = useState(false);
+  const [searchInputHome, setSearchInputHome] = useState('');
+
   return (
     <HashRouter>
       <div className="w-screen bg-black">
@@ -188,10 +191,27 @@ function App() {
         </aside>
         <div className="w-screen bg-black pt-20">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route
+              path="/"
+              element={
+                <Home
+                  searchInput={searchInputHome}
+                  setSearchInput={setSearchInputHome}
+                />
+              }
+            />
             <Route path="/:mediatype/:movieid" element={<Movie />} />
             <Route path="/person/:actorid" element={<Actors />} />
             <Route path="/list/:type/:category" element={<List />} />
+            <Route
+              path="/search/*"
+              element={
+                <Search
+                  searchInput={searchInputHome}
+                  setSearchInput={setSearchInputHome}
+                />
+              }
+            />
           </Routes>
         </div>
         <footer className="bg-slate-400">

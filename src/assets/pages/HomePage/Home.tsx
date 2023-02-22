@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BsDot } from 'react-icons/bs';
+import { BsDot, BsSearch } from 'react-icons/bs';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   loadFeatured,
@@ -8,7 +8,12 @@ import {
   loadTrending,
 } from '../../utils/fetchFunctions';
 
-const Home = () => {
+interface IHome {
+  searchInput: string;
+  setSearchInput: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const Home = ({ searchInput, setSearchInput }: IHome) => {
   const [mediaType, setMediaType] = useState('movie');
   const [timeWindow, setTimeWindow] = useState('day');
   const [featuredMovieID, setFeaturedMovieID] = useState('');
@@ -19,6 +24,7 @@ const Home = () => {
   const [actors, setActors] = useState<null | Array<Object>>(null);
   const navigate = useNavigate();
   const urlForImageFetch = 'https://image.tmdb.org/t/p/original';
+  const API_KEY = import.meta.env.VITE_API_KEY;
   useEffect(() => {
     loadFeatured(
       setFeaturedMovieImage,
@@ -30,6 +36,13 @@ const Home = () => {
     loadTrending(setTrending, mediaType, timeWindow);
     loadTopRated(setTopRated, mediaType);
     loadPopularActors(setActors);
+    const search = async () => {
+      const res = await fetch(
+        `https://api.themoviedb.org/3/search/person?api_key=${API_KEY}&query=dexter`
+      );
+      const data = await res.json();
+    };
+    search();
   }, []);
   useEffect(() => {
     loadFeatured(
@@ -45,10 +58,10 @@ const Home = () => {
 
   return (
     <div className="flex flex-col w-screen min-h-screen bg-black gap-10 overflow-x-hidden">
-      <header className="w-screen h-4/5 pl-5 pr-5">
-        <div className="w-full h-full relative rounded-lg overflow-hidden">
+      <header className="flex flex-col gap-10 w-screen pl-5 pr-5">
+        <div className="w-full h-[65vh] relative rounded-lg overflow-hidden">
           <img
-            className="w-full h-full object-fill"
+            className="absolute -top-16 rounded-b-lg"
             src={featuredMovieImage}
             alt=" "
           />
@@ -56,7 +69,7 @@ const Home = () => {
             to={`${mediaType}/${featuredMovieID}`}
             className="absolute top-0 w-full h-5/6"
           ></Link>
-          <div className="absolute flex-col flex-wrap bottom-0 w-full flex h-1/5 justify-evenly items-center pr-5 pl-5 backdrop-blur-sm">
+          <div className="absolute flex-col flex-wrap bottom-0 w-full flex h-1/5 justify-evenly items-center pr-5 pl-5 backdrop-blur-lg">
             <div className="flex flex-row justify-evenly w-full items-center">
               {genres &&
                 genres.map((element, index) => {
@@ -87,6 +100,27 @@ const Home = () => {
             </div>
           </div>
         </div>
+        <form
+          onSubmit={() => {
+            if (searchInput.length === 0) return;
+            navigate(`/search/movie/${searchInput}`);
+          }}
+        >
+          <label className="flex w-full bg-white rounded-lg overflow-hidden p-1">
+            <input
+              onChange={(e: React.FormEvent<HTMLInputElement>) => {
+                setSearchInput(e.currentTarget.value);
+              }}
+              value={searchInput}
+              className="flex-grow p-2"
+              placeholder="Search"
+              type="text"
+            />
+            <button className="pl-5 pr-5 border-2 rounded-lg border-black active:bg-green-400 ">
+              <BsSearch />
+            </button>
+          </label>
+        </form>
       </header>
       <main className="flex flex-col gap-5 w-full overflow-hidden pl-5">
         <div className="flex flex-col gap-2.5">

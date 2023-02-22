@@ -197,8 +197,8 @@ const Actors = () => {
                         <FaRegSadCry className="text-white text-5xl" />
                       </div>
                     )}
-                    <div className="w-full flex-grow flex justify-center items-center">
-                      <p className="text-white font-bold text-center">
+                    <div className="w-full flex-grow flex justify-center items-center pt-1 pb-1">
+                      <p className="text-white font-bold text-center line-clamp-2">
                         {object.title}
                       </p>
                     </div>
@@ -241,8 +241,8 @@ const Actors = () => {
                         <FaRegSadCry className="text-white text-5xl" />
                       </div>
                     )}
-                    <div className="w-full flex-grow flex justify-center items-center">
-                      <p className="text-white font-bold text-center">
+                    <div className="w-full flex-grow flex justify-center items-center pt-1 pb-1">
+                      <p className="text-white font-bold text-center line-clamp-2">
                         {object.name}
                       </p>
                     </div>
