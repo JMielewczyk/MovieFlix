@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { BsArrowDownCircle } from 'react-icons/bs';
 import { FaRegSadCry } from 'react-icons/fa';
 import { Link, useParams } from 'react-router-dom';
 import { IdataObject } from './interfaces';
@@ -10,28 +9,81 @@ const SearchList = () => {
   const urlToApi = 'https://api.themoviedb.org/3';
   const urlForImage = 'https://image.tmdb.org/t/p/original';
   const [data, setData] = useState<Array<IdataObject>>([]);
+  const [pages, setPages] = useState<number[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   useEffect(() => {
     const loadContent = async () => {
       const res = await fetch(
-        `${urlToApi}/search/${type}?api_key=${API_KEY}&query=${query}`
+        `${urlToApi}/search/${type}?api_key=${API_KEY}&query=${query}&page=${currentPage}`
       );
       const data = await res.json();
+      let pages: number[] = [];
+      for (let i = 1; i <= data.total_pages; i++) {
+        pages = [...pages, i];
+      }
+      setPages(pages);
       setData(data.results);
     };
     loadContent();
   }, []);
 
   useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+
     const loadContent = async () => {
+      const currentPage = 1;
       const res = await fetch(
-        `${urlToApi}/search/${type}?api_key=${API_KEY}&query=${query}`
+        `${urlToApi}/search/${type}?api_key=${API_KEY}&query=${query}&page=${currentPage}`
       );
       const data = await res.json();
+      let pages: number[] = [];
+      for (let i = 1; i <= data.total_pages; i++) {
+        pages = [...pages, i];
+      }
+      //Change property name to match the same name for each type(movie, tv, person)
+      for (let object in data.results) {
+        if (!data.results[object].hasOwnProperty('poster_path')) {
+          data.results[object].poster_path = data.results[object].profile_path;
+          delete data.results[object].profile_path;
+        }
+      }
+      setPages(pages);
       setData(data.results);
+      setCurrentPage(1);
     };
     loadContent();
   }, [type, query]);
-  console.log(data);
+
+  useEffect(() => {
+    const loadContent = async () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+      const res = await fetch(
+        `${urlToApi}/search/${type}?api_key=${API_KEY}&query=${query}&page=${currentPage}`
+      );
+      const data = await res.json();
+      let pages: number[] = [];
+      for (let i = 1; i <= data.total_pages; i++) {
+        pages = [...pages, i];
+      }
+      //Change property name to match the same name for each type(movie, tv, person)
+      for (let object in data.results) {
+        if (!data.results[object].hasOwnProperty('poster_path')) {
+          data.results[object].poster_path = data.results[object].profile_path;
+          delete data.results[object].profile_path;
+        }
+      }
+      setPages(pages);
+      setData(data.results);
+    };
+    loadContent();
+  }, [currentPage]);
+
   return (
     <div className="flex flex-col">
       {' '}
@@ -42,7 +94,11 @@ const SearchList = () => {
             : 'flex flex-col gap-5'
         }
       >
-        {data &&
+        {data.length === 0 ? (
+          <p className="text-white text-xl">
+            No results for {`${query}`} in {`${type}`} category
+          </p>
+        ) : (
           data.map((object) => {
             return (
               <Link
@@ -60,12 +116,12 @@ const SearchList = () => {
                 >
                   {object.poster_path ? (
                     <img
-                      className="h-full rounded-l-lg"
-                      src={`${urlForImage}${
+                      className={
                         type !== 'person'
-                          ? object.poster_path
-                          : object.profile_path
-                      }`}
+                          ? 'h-full rounded-l-lg'
+                          : 'w-32 rounded-lg'
+                      }
+                      src={`${urlForImage}${object.poster_path}`}
                       alt=""
                     />
                   ) : (
@@ -98,10 +154,51 @@ const SearchList = () => {
                 </div>
               </Link>
             );
-          })}
-        <div className="flex justify-center items-center">
-          <BsArrowDownCircle className="text-white text-5xl animate-bounce" />
-        </div>
+          })
+        )}
+      </div>
+      <div className="flex justify-evenly items-center pt-5">
+        {pages.map((page) => {
+          if (pages.length === 1) return;
+          if (page <= currentPage && page >= currentPage - 5) {
+            return (
+              <button
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  setCurrentPage(Number(e.currentTarget.textContent));
+                }}
+                className="text-white flex-grow text-center"
+              >
+                {page}
+              </button>
+            );
+          } else if (page > currentPage && page <= currentPage + 4) {
+            return (
+              <button
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  setCurrentPage(Number(e.currentTarget.textContent));
+                }}
+                className="text-white flex-grow text-center"
+              >
+                {page}
+              </button>
+            );
+          } else if (page <= currentPage + 5 && page > currentPage - 5) {
+            return (
+              <span className="text-white flex-grow text-center">...</span>
+            );
+          } else if (page >= pages.length - 1) {
+            return (
+              <button
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  setCurrentPage(Number(e.currentTarget.textContent));
+                }}
+                className="text-white flex-grow text-center"
+              >
+                {page}
+              </button>
+            );
+          }
+        })}
       </div>
     </div>
   );

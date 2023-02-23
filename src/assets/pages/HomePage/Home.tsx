@@ -24,7 +24,6 @@ const Home = ({ searchInput, setSearchInput }: IHome) => {
   const [actors, setActors] = useState<null | Array<Object>>(null);
   const navigate = useNavigate();
   const urlForImageFetch = 'https://image.tmdb.org/t/p/original';
-  const API_KEY = import.meta.env.VITE_API_KEY;
   useEffect(() => {
     loadFeatured(
       setFeaturedMovieImage,
@@ -36,13 +35,6 @@ const Home = ({ searchInput, setSearchInput }: IHome) => {
     loadTrending(setTrending, mediaType, timeWindow);
     loadTopRated(setTopRated, mediaType);
     loadPopularActors(setActors);
-    const search = async () => {
-      const res = await fetch(
-        `https://api.themoviedb.org/3/search/person?api_key=${API_KEY}&query=dexter`
-      );
-      const data = await res.json();
-    };
-    search();
   }, []);
   useEffect(() => {
     loadFeatured(
@@ -101,11 +93,17 @@ const Home = ({ searchInput, setSearchInput }: IHome) => {
           </div>
         </div>
         <form
-          onSubmit={() => {
+          onSubmit={(e: React.FormEvent) => {
+            e.preventDefault();
             if (searchInput.length === 0) return;
             navigate(`/search/movie/${searchInput}`);
           }}
+          className="flex flex-col gap-2.5"
         >
+          <h1 className="text-white text-3xl">Welcome</h1>
+          <h3 className="text-white ">
+            Millions of movies, TV shows and people to discover. Explore now.
+          </h3>
           <label className="flex w-full bg-white rounded-lg overflow-hidden p-1">
             <input
               onChange={(e: React.FormEvent<HTMLInputElement>) => {

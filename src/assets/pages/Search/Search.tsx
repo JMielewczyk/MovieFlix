@@ -14,9 +14,10 @@ const Search = ({ searchInput, setSearchInput }: ISearch) => {
     <div className="flex flex-col w-screen min-h-screen bg-black gap-10 overflow-x-hidden">
       <header className="pl-5 pr-5">
         <form
-          onSubmit={() => {
+          onSubmit={(e: React.FormEvent) => {
+            e.preventDefault();
             if (searchInput.length === 0) return;
-            navigate(`/search/${searchInput}`);
+            navigate(`/search/movie/${searchInput}`);
           }}
         >
           <label className="flex w-full bg-white rounded-lg overflow-hidden p-1">
@@ -35,17 +36,32 @@ const Search = ({ searchInput, setSearchInput }: ISearch) => {
           </label>
         </form>
       </header>
-      <main className="pl-5 pr-5">
+      <main className="flex flex-col gap-10  pl-5 pr-5">
         <div>
-          <ul className="text-white flex border justify-between rounded-lg">
-            <NavLink to={`/search/movie/${searchInput}`}>
-              <li className="flex-grow text-center border-r p-1">Movies</li>
+          <ul className="text-white flex border justify-between rounded-lg ">
+            <NavLink
+              className={({ isActive }) =>
+                isActive ? 'flex-grow bg-green-400 rounded-l-lg' : 'flex-grow'
+              }
+              to={`/search/movie/${searchInput}`}
+            >
+              <li className="text-center border-r p-1">Movies</li>
             </NavLink>
-            <NavLink to={`/search/tv/${searchInput}`}>
-              <li className="flex-grow text-center border-r p-1">TV shows</li>
+            <NavLink
+              className={({ isActive }) =>
+                isActive ? 'flex-grow bg-green-400' : 'flex-grow'
+              }
+              to={`/search/tv/${searchInput}`}
+            >
+              <li className="text-center border-r p-1">TV shows</li>
             </NavLink>
-            <NavLink to={`/search/person/${searchInput}`}>
-              <li className="flex-grow text-center p-1">People</li>
+            <NavLink
+              className={({ isActive }) =>
+                isActive ? 'flex-grow bg-green-400 rounded-r-lg' : 'flex-grow'
+              }
+              to={`/search/person/${searchInput}`}
+            >
+              <li className="text-center p-1">People</li>
             </NavLink>
           </ul>
         </div>
