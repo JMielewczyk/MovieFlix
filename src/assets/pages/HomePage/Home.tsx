@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BsDot, BsSearch } from 'react-icons/bs';
+import { FaRegSadCry } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   loadFeatured,
@@ -188,35 +189,69 @@ const Home = ({ searchInput, setSearchInput }: IHome) => {
             </button>
           </div>
         </div>
-        <div className="flex w-full overflow-x-scroll transition-all">
+        <div className="flex w-full h-[300px] overflow-x-scroll transition-all">
           {trending &&
-            trending.map((object: { poster_path?: string; id?: number }) => (
-              <Link to={`${mediaType}/${object.id}`}>
-                <div className="w-44 flex-shrink-0 pr-3">
-                  <img
-                    className="rounded-lg object-fill "
-                    src={urlForImageFetch + object.poster_path}
-                    alt=""
-                  />
-                </div>
-              </Link>
-            ))}
+            trending.map(
+              (object: {
+                poster_path?: string;
+                id?: number;
+                title?: string;
+                original_name?: string;
+                known_for_department?: string;
+              }) => (
+                <Link to={`${mediaType}/${object.id}`}>
+                  <div className="w-44 h-[300px] flex-shrink-0 pr-3">
+                    {object.poster_path ? (
+                      <img
+                        className="h-5/6  rounded-lg object-fill "
+                        src={`${urlForImageFetch}${object.poster_path}`}
+                        alt=""
+                      />
+                    ) : (
+                      <div className="flex flex-col justify-center gap-5 items-center border rounded-lg w-full h-5/6">
+                        <p className="text-white text-center">
+                          Sorry, no image
+                        </p>
+                        <FaRegSadCry className="text-white text-5xl" />
+                      </div>
+                    )}
+
+                    <p className="text-white text-center line-clamp-1">
+                      {object.title}
+                      {object.original_name}
+                    </p>
+                    {mediaType === 'person' ? (
+                      <p className="text-white text-center line-clamp-1">
+                        {object.known_for_department}
+                      </p>
+                    ) : null}
+                  </div>
+                </Link>
+              )
+            )}
         </div>
-        <p className="text-white text-4xl">Top Rated</p>
-        <div className="flex w-full overflow-x-scroll">
-          {topRated &&
-            topRated.map((object: { poster_path?: string; id?: number }) => (
-              <Link to={`movie/${object.id}`}>
-                <div className="w-44 flex-shrink-0 pr-3">
-                  <img
-                    className="rounded-lg object-fill "
-                    src={urlForImageFetch + object.poster_path}
-                    alt=""
-                  />
-                </div>
-              </Link>
-            ))}
-        </div>
+        {mediaType !== 'person' ? (
+          <>
+            <p className="text-white text-4xl">Top Rated</p>
+            <div className="flex w-full overflow-x-scroll">
+              {topRated &&
+                topRated.map(
+                  (object: { poster_path?: string; id?: number }) => (
+                    <Link to={`movie/${object.id}`}>
+                      <div className="w-44 flex-shrink-0 pr-3">
+                        <img
+                          className="  rounded-lg object-fill "
+                          src={urlForImageFetch + object.poster_path}
+                          alt=""
+                        />
+                      </div>
+                    </Link>
+                  )
+                )}
+            </div>
+          </>
+        ) : null}
+
         <p className="text-white text-4xl">Popular Actors</p>
         <div className="flex w-full overflow-x-scroll">
           {actors &&

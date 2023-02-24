@@ -7,8 +7,13 @@ import {
 } from 'react-icons/ai';
 import { BsFillArrowRightCircleFill } from 'react-icons/bs';
 import { FaRegSadCry } from 'react-icons/fa';
-import { Link, useLocation, useParams } from 'react-router-dom';
-import { getDetails, getExternal, loadMoviesAndTV } from './features';
+import { Link, useParams } from 'react-router-dom';
+import {
+  getDetails,
+  getExternal,
+  getImages,
+  loadMoviesAndTV,
+} from './features';
 import { ICredits, IdataDetails, Iexternal } from './interfaces';
 
 const Actors = () => {
@@ -28,11 +33,14 @@ const Actors = () => {
   const [maxMoviesVisible, setMaxMoviesVisible] = useState(10);
   const [loadMoreTVBtn, setLoadMoreTVBtn] = useState(false);
   const [maxTVVisible, setMaxTVVisible] = useState(10);
+  const [images, setImages] = useState([]);
   const [type, setType] = useState(' ');
 
-  const location = useLocation();
-
   useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
     getDetails(actorid, setDataDetails, setYearsOld);
     getExternal(actorid, setExternal);
     loadMoviesAndTV(
@@ -59,14 +67,8 @@ const Actors = () => {
       setLoadMoreMoviesBtn,
       setLoadMoreTVBtn
     );
+    getImages(actorid, setImages);
   }, []);
-
-  useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-  }, [location.pathname]);
 
   useEffect(() => {
     loadMoviesAndTV(
@@ -86,15 +88,17 @@ const Actors = () => {
   return (
     <div className="flex flex-col w-screen min-h-screen overflow-hidden pl-5 pr-5 bg-black gap-7">
       <header className="w-full h-4/5 flex flex-col gap-2.5">
-        <div className="w-full flex justify-center items-center">
-          <div className="w-40 h-40 rounded-lg overflow-hidden">
-            <img
-              className="w-full -translate-y-5"
-              src={`${urlForImage}${dataDetails.profile_path}`}
-              alt=""
-            />
+        {dataDetails.profile_path ? (
+          <div className="w-full flex justify-center items-center">
+            <div className="w-40 h-40 rounded-lg overflow-hidden">
+              <img
+                className="w-full -translate-y-5"
+                src={`${urlForImage}${dataDetails.profile_path}`}
+                alt=""
+              />
+            </div>
           </div>
-        </div>
+        ) : null}
         <h1 className="text-white text-3xl text-center">{dataDetails.name}</h1>
         <div className="flex justify-center items-center">
           {external.facebook_id && (
@@ -115,72 +119,82 @@ const Actors = () => {
         </div>
         <div className="flex flex-col gap-2.5">
           <p className="text-white text-xl">Personal information</p>
-          <div>
-            <p className="text-white">Known for</p>
-            <p className="text-white font-light">
-              {dataDetails.known_for_department}
-            </p>
-          </div>
-          <div>
-            <p className="text-white">Birthday:</p>
-            <p className="text-white font-light">
-              {dataDetails.birthday}
-              {dataDetails.deathday ? null : ` (${yearsOld} years old)`}
-            </p>
-          </div>
-          <div>
-            <p className="text-white">Date of death:</p>
-            <p className="text-white font-light">
-              {dataDetails.deathday}
-              {dataDetails.deathday ? ` (${yearsOld} years old)` : null}
-            </p>
-          </div>
-          <div>
-            <p className="text-white">Place of birth:</p>
-            <p className="text-white font-light">
-              {dataDetails.place_of_birth}
-            </p>
-          </div>
+          {dataDetails.known_for_department ? (
+            <div>
+              <p className="text-white">Known for</p>
+              <p className="text-white font-light">
+                {dataDetails.known_for_department}
+              </p>
+            </div>
+          ) : null}
+          {dataDetails.birthday ? (
+            <div>
+              <p className="text-white">Birthday:</p>
+              <p className="text-white font-light">
+                {dataDetails.birthday}
+                {dataDetails.deathday ? null : ` (${yearsOld} years old)`}
+              </p>
+            </div>
+          ) : null}
+          {dataDetails.deathday ? (
+            <div>
+              <p className="text-white">Date of death:</p>
+              <p className="text-white font-light">
+                {dataDetails.deathday}
+                {dataDetails.deathday ? ` (${yearsOld} years old)` : null}
+              </p>
+            </div>
+          ) : null}
+          {dataDetails.place_of_birth ? (
+            <div>
+              <p className="text-white">Place of birth:</p>
+              <p className="text-white font-light">
+                {dataDetails.place_of_birth}
+              </p>
+            </div>
+          ) : null}
         </div>
       </header>
       <main className="w-full flex flex-col gap-5">
-        <div className="flex flex-col gap-2.5">
-          <p className="text-white text-xl">Biography</p>
-          <p
-            className={
-              fullBiography
-                ? 'text-white font-light'
-                : 'text-white font-light max-h-60 overflow-hidden'
-            }
-          >
-            {dataDetails.biography}
-          </p>
-          <button
-            onClick={() => {
-              setFullBiography((prevState) => !prevState);
-            }}
-            className="text-white flex justify-center gap-2.5 items-center border-t-2"
-          >
-            {fullBiography ? (
-              <>
-                <AiOutlineArrowDown className="rotate-180" />
-                <p>Show less</p>
-                <AiOutlineArrowDown className="rotate-180" />
-              </>
-            ) : (
-              <>
-                <AiOutlineArrowDown />
-                <p>Show more</p>
-                <AiOutlineArrowDown />
-              </>
-            )}
-          </button>
-        </div>
-        <div className="flex flex-col w-full overflow-x-scroll transition-all gap-2.5">
-          <p className="text-xl text-white ">Acted in movies</p>
-          <div className="flex overflow-x-scroll">
-            {movieCredits &&
-              movieCredits.map((object) => (
+        {dataDetails.biography ? (
+          <div className="flex flex-col gap-2.5">
+            <p className="text-white text-xl">Biography</p>
+            <p
+              className={
+                fullBiography
+                  ? 'text-white font-light'
+                  : 'text-white font-light max-h-60 overflow-hidden'
+              }
+            >
+              {dataDetails.biography}
+            </p>
+            <button
+              onClick={() => {
+                setFullBiography((prevState) => !prevState);
+              }}
+              className="text-white flex justify-center gap-2.5 items-center border-t-2"
+            >
+              {fullBiography ? (
+                <>
+                  <AiOutlineArrowDown className="rotate-180" />
+                  <p>Show less</p>
+                  <AiOutlineArrowDown className="rotate-180" />
+                </>
+              ) : (
+                <>
+                  <AiOutlineArrowDown />
+                  <p>Show more</p>
+                  <AiOutlineArrowDown />
+                </>
+              )}
+            </button>
+          </div>
+        ) : null}
+        {movieCredits.length > 0 ? (
+          <div className="flex flex-col w-full overflow-x-scroll transition-all gap-2.5">
+            <p className="text-xl text-white ">Movies</p>
+            <div className="flex overflow-x-scroll">
+              {movieCredits.map((object) => (
                 <Link to={`/movie/${object.id}`}>
                   <div className="flex flex-col justify-between w-44 min-h-full border-2 flex-shrink-0 mr-3 rounded-lg">
                     {typeof object.poster_path === 'string' ? (
@@ -205,26 +219,27 @@ const Actors = () => {
                   </div>
                 </Link>
               ))}
-            {loadMoreMoviesBtn && (
-              <div className="flex justify-center items-center">
-                <BsFillArrowRightCircleFill
-                  onClick={() => {
-                    let maxNumber = maxMoviesVisible;
-                    maxNumber += 10;
-                    setType('movie_credits');
-                    setMaxMoviesVisible(maxNumber);
-                  }}
-                  className="text-white text-5xl"
-                />
-              </div>
-            )}
+              {loadMoreMoviesBtn && (
+                <div className="flex justify-center items-center">
+                  <BsFillArrowRightCircleFill
+                    onClick={() => {
+                      let maxNumber = maxMoviesVisible;
+                      maxNumber += 10;
+                      setType('movie_credits');
+                      setMaxMoviesVisible(maxNumber);
+                    }}
+                    className="text-white text-5xl"
+                  />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-        <div className="flex flex-col w-full overflow-x-scroll transition-all gap-2.5">
-          <p className="text-xl text-white ">Was in TV Shows</p>
-          <div className="flex overflow-x-scroll">
-            {tvCredits &&
-              tvCredits.map((object) => (
+        ) : null}
+        {tvCredits.length > 0 ? (
+          <div className="flex flex-col w-full overflow-x-scroll transition-all gap-2.5">
+            <p className="text-xl text-white ">TV Shows</p>
+            <div className="flex overflow-x-scroll">
+              {tvCredits.map((object) => (
                 <Link to={`/tv/${object.id}`}>
                   <div className="flex flex-col justify-between w-44 min-h-full border-2 flex-shrink-0 mr-3 rounded-lg">
                     {typeof object.poster_path === 'string' ? (
@@ -249,25 +264,26 @@ const Actors = () => {
                   </div>
                 </Link>
               ))}
-            {loadMoreTVBtn && (
-              <div className="flex justify-center items-center">
-                <BsFillArrowRightCircleFill
-                  onClick={() => {
-                    let maxNumber = maxTVVisible;
-                    maxNumber += 10;
-                    setType('tv_credits');
-                    setMaxTVVisible(maxNumber);
-                  }}
-                  className="text-white text-5xl"
-                />
-              </div>
-            )}
+              {loadMoreTVBtn && (
+                <div className="flex justify-center items-center">
+                  <BsFillArrowRightCircleFill
+                    onClick={() => {
+                      let maxNumber = maxTVVisible;
+                      maxNumber += 10;
+                      setType('tv_credits');
+                      setMaxTVVisible(maxNumber);
+                    }}
+                    className="text-white text-5xl"
+                  />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        ) : null}
         <div className="flex flex-col gap-2.5">
           <p className="text-white text-3xl">Timeline</p>
           <div className="flex overflow-x-scroll gap-5">
-            {movieTimeline && (
+            {movieTimeline.length > 0 ? (
               <div className="flex flex-col gap-2.5 flex-shrink-0 w-full">
                 <p className="text-white">Movies</p>
                 <div
@@ -315,8 +331,8 @@ const Actors = () => {
                   {fullMovieTimeline ? 'Show less' : 'Show more'}
                 </button>
               </div>
-            )}
-            {tvTimeline && (
+            ) : null}
+            {tvTimeline.length > 0 ? (
               <div className="flex flex-col gap-2.5 flex-shrink-0 w-full">
                 <p className="text-white">TV Shows</p>
                 <div
@@ -364,9 +380,24 @@ const Actors = () => {
                   {fullTVTimeline ? 'Show less' : 'Show more'}
                 </button>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
+        {images.length > 0 ? (
+          <>
+            <p className="text-white text-3xl">Profile pics</p>
+            <div className="flex h-[300px] overflow-x-scroll">
+              {images.map((object: { file_path?: string }) => (
+                <div className="w-44 h-full  flex-shrink-0 mr-3">
+                  <img
+                    className="rounded-lg"
+                    src={`${urlForImage}${object.file_path}`}
+                  />
+                </div>
+              ))}
+            </div>
+          </>
+        ) : null}
       </main>
     </div>
   );

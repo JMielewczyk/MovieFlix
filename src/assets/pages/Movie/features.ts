@@ -124,3 +124,27 @@ export const getCredits = async (
   );
   setCast(cast);
 };
+
+export const getSimilar = async (
+  mediatype: string | undefined,
+  movieid: string | undefined,
+  setSimilar: React.Dispatch<React.SetStateAction<Object[]>>
+) => {
+  const res = await fetch(
+    `${urlToApi}/${mediatype}/${movieid}/similar?api_key=${API_KEY}`
+  );
+  const data = await res.json();
+  setSimilar(data.results);
+};
+
+export const getRecommended = async (
+  mediatype: string | undefined,
+  movieid: string | undefined,
+  setRecommended: React.Dispatch<React.SetStateAction<Object[]>>
+) => {
+  const res = await fetch(
+    `${urlToApi}/${mediatype}/${movieid}/recommendations?api_key=${API_KEY}`
+  );
+  const data = await res.json();
+  setRecommended(data.results);
+};

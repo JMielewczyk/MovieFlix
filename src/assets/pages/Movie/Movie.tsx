@@ -1,8 +1,15 @@
 import { useEffect, useState } from 'react';
 import { AiOutlinePlayCircle } from 'react-icons/ai';
 import { BsDot, BsFillArrowRightCircleFill } from 'react-icons/bs';
-import { Link, useLocation, useParams } from 'react-router-dom';
-import { getCredits, getDetails, getPosters, getVideos } from './features';
+import { Link, useParams } from 'react-router-dom';
+import {
+  getCredits,
+  getDetails,
+  getPosters,
+  getRecommended,
+  getSimilar,
+  getVideos,
+} from './features';
 import { FaRegSadCry } from 'react-icons/fa';
 import { IdataDetails } from './interfaces';
 
@@ -21,10 +28,16 @@ const Movie = () => {
   const [maxCastVisible, setMaxCastVisible] = useState<number>(10);
   const [maxPostersVisible, setMaxPostersVisible] = useState<number>(10);
   const [maxVideosVisible, setMaxVideosVisible] = useState<number>(5);
+  const [similar, setSimilar] = useState<Object[]>([]);
+  const [recommended, setRecommended] = useState<Object[]>([]);
   const { movieid } = useParams();
   const { mediatype } = useParams();
   const urlForImage = 'https://image.tmdb.org/t/p/original';
   useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
     getDetails(
       mediatype,
       movieid,
@@ -49,7 +62,41 @@ const Movie = () => {
       setImages
     );
     getVideos(movieid, maxVideosVisible, setLoadMoreVideosBtn, setVideos);
+    getSimilar(mediatype, movieid, setSimilar);
+    getRecommended(mediatype, movieid, setRecommended);
   }, []);
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+    getDetails(
+      mediatype,
+      movieid,
+      setDataDetails,
+      setGenres,
+      setRuntime,
+      setFullRelease
+    );
+    getCredits(
+      mediatype,
+      movieid,
+      setDirector,
+      setCast,
+      maxCastVisible,
+      setLoadMoreCastBtn
+    );
+    getPosters(
+      mediatype,
+      movieid,
+      maxPostersVisible,
+      setLoadMorePostersBtn,
+      setImages
+    );
+    getVideos(movieid, maxVideosVisible, setLoadMoreVideosBtn, setVideos);
+    getSimilar(mediatype, movieid, setSimilar);
+  }, [movieid]);
 
   useEffect(() => {
     getPosters(
@@ -78,15 +125,6 @@ const Movie = () => {
 
   const windowWidth = window.innerWidth - 50;
   const windowHeight = windowWidth * (3 / 4);
-
-  const location = useLocation();
-
-  useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-  }, [location.pathname]);
 
   return (
     <div className="flex flex-col w-screen min-h-screen overflow-hidden pl-5 pr-5 bg-black gap-7">
@@ -179,7 +217,7 @@ const Movie = () => {
                 profile_path?: string | null;
                 name?: string;
                 character?: string;
-                id?: string;
+                id?: number;
               }) => {
                 return (
                   <Link to={`/person/${object.id}`}>
@@ -280,6 +318,88 @@ const Movie = () => {
             </div>
           )}
         </div>
+        {similar.length > 0 ? (
+          <>
+            <p className="text-white text-3xl ">Similar</p>
+            <div className="flex overflow-x-scroll">
+              {similar.map(
+                (object: {
+                  id?: number;
+                  poster_path?: string;
+                  original_title?: string;
+                  name?: string;
+                }) => (
+                  <Link to={`/${mediatype}/${object.id}`}>
+                    <div className="w-44 h-[300px] flex-shrink-0 pr-3 overflow-hidden">
+                      {object.poster_path ? (
+                        <img
+                          className="h-5/6 rounded-lg object-fill"
+                          src={`${urlForImage}${object.poster_path}`}
+                          alt=""
+                        />
+                      ) : (
+                        <div className="flex flex-col justify-center gap-5 items-center border rounded-lg w-full h-5/6">
+                          <p className="text-white text-center">
+                            Sorry, no image for this
+                            {mediatype === 'movie' ? ' movie' : ' tv show'}
+                          </p>
+                          <FaRegSadCry className="text-white text-5xl" />
+                        </div>
+                      )}
+
+                      <p className="text-white h-1/6 text-center line-clamp-2">
+                        {object.original_title
+                          ? object.original_title
+                          : object.name}
+                      </p>
+                    </div>
+                  </Link>
+                )
+              )}
+            </div>
+          </>
+        ) : null}
+        {recommended.length > 0 ? (
+          <>
+            <p className="text-white text-3xl ">Recommended</p>
+            <div className="flex overflow-x-scroll">
+              {recommended.map(
+                (object: {
+                  id?: number;
+                  poster_path?: string;
+                  original_title?: string;
+                  name?: string;
+                }) => (
+                  <Link to={`/${mediatype}/${object.id}`}>
+                    <div className="w-44 h-[300px] flex-shrink-0 pr-3 overflow-hidden">
+                      {object.poster_path ? (
+                        <img
+                          className="h-5/6 rounded-lg object-fill"
+                          src={`${urlForImage}${object.poster_path}`}
+                          alt=""
+                        />
+                      ) : (
+                        <div className="flex flex-col justify-center gap-5 items-center border rounded-lg w-full h-5/6">
+                          <p className="text-white text-center">
+                            Sorry, no image for this
+                            {mediatype === 'movie' ? ' movie' : ' tv show'}
+                          </p>
+                          <FaRegSadCry className="text-white text-5xl" />
+                        </div>
+                      )}
+
+                      <p className="text-white h-1/6 text-center line-clamp-2">
+                        {object.original_title
+                          ? object.original_title
+                          : object.name}
+                      </p>
+                    </div>
+                  </Link>
+                )
+              )}
+            </div>
+          </>
+        ) : null}
       </main>
     </div>
   );

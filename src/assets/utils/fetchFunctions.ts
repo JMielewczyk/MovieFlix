@@ -50,6 +50,14 @@ export const loadTrending = async (
   timeWindow: string
 ) => {
   const trending = await getTrending(mediaType, timeWindow);
+  //Change property name to match the same name for each type(movie, tv, person)
+  for (let object in trending.results) {
+    if (!trending.results[object].hasOwnProperty('poster_path')) {
+      trending.results[object].poster_path =
+        trending.results[object].profile_path;
+      delete trending.results[object].profile_path;
+    }
+  }
   setTrending(trending.results);
 };
 export const loadTopRated = async (

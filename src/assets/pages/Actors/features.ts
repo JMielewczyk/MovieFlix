@@ -133,3 +133,14 @@ export const getExternal = async (
   const dataExternal = await resExternal.json();
   setExternal(dataExternal);
 };
+
+export const getImages = async (
+  actorid: string | undefined,
+  setImages: React.Dispatch<React.SetStateAction<never[]>>
+) => {
+  const resImages = await fetch(
+    `${urlToApi}/person/${actorid}/images?api_key=${API_KEY}`
+  );
+  const dataImages = await resImages.json();
+  setImages(dataImages.profiles);
+};

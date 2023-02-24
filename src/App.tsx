@@ -1,7 +1,8 @@
-import { useState, createContext } from 'react';
-import { HashRouter, Link, NavLink, Route, Routes } from 'react-router-dom';
-import { AiOutlineMenu } from 'react-icons/ai';
+import { useState } from 'react';
+import { HashRouter, Link, Route, Routes } from 'react-router-dom';
+import { AiFillGithub, AiOutlineMenu } from 'react-icons/ai';
 import { ImCross } from 'react-icons/im';
+import { CiLinkedin } from 'react-icons/ci';
 
 import Home from './assets/pages/HomePage/Home';
 import Movie from './assets/pages/Movie/Movie';
@@ -214,8 +215,24 @@ function App() {
             />
           </Routes>
         </div>
-        <footer className="bg-slate-400">
-          <p className="text-white">This is footer</p>
+        <footer className="bg-slate-700 flex flex-col text-center mt-10 gap-5 pt-2.5 pb-2.5">
+          <p className="text-3xl ">MovieFlix</p>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Libero,
+            voluptatem! Fuga soluta aspernatur iusto incidunt dolore in id eaque
+            pariatur sit sunt quis magnam, nam explicabo, sed ea voluptatibus
+            neque.
+          </p>
+          <p>Coded by:</p>
+          <p>Jakub Mielewczyk</p>
+          <div className="flex justify-center gap-5">
+            <Link to="https://www.linkedin.com/in/jakub-mielewczyk-b411a6221/">
+              <CiLinkedin className="text-5xl" />
+            </Link>
+            <Link to="https://github.com/JMielewczyk">
+              <AiFillGithub className="text-5xl" />
+            </Link>
+          </div>
         </footer>
       </div>
     </HashRouter>
