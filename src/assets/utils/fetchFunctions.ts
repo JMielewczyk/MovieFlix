@@ -17,7 +17,9 @@ export const getAllGenres = async () => {
 };
 
 export const loadFeatured = async (
-  setFeaturedMovieImage: React.Dispatch<React.SetStateAction<string>>,
+  setFeaturedMovieTitle: React.Dispatch<React.SetStateAction<string>>,
+  setFeaturedMoviePoster: React.Dispatch<React.SetStateAction<string>>,
+  setFeaturedMovieBackdrop: React.Dispatch<React.SetStateAction<string>>,
   setFeaturedMovieID: React.Dispatch<React.SetStateAction<string>>,
   setGenres: React.Dispatch<React.SetStateAction<string[]>>,
   mediaType: string,
@@ -27,8 +29,11 @@ export const loadFeatured = async (
   const trending = await getTrending(mediaType, timeWindow);
   const featured = trending.results[0];
   const poster = urlForImageFetch + featured.poster_path;
-  setFeaturedMovieImage(poster);
+  const backdrop = urlForImageFetch + featured.backdrop_path;
+  setFeaturedMoviePoster(poster);
+  setFeaturedMovieBackdrop(backdrop);
   setFeaturedMovieID(featured.id);
+  setFeaturedMovieTitle(featured.title);
   const genresIds: Array<{ id: number; name: string }> = await getAllGenres();
   const featuredMovieGenresIds: number[] = featured.genre_ids;
   let featuredMovieGenresNames: string[] = [];

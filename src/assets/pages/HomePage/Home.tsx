@@ -17,17 +17,21 @@ interface IHome {
 const Home = ({ searchInput, setSearchInput }: IHome) => {
   const [mediaType, setMediaType] = useState('movie');
   const [timeWindow, setTimeWindow] = useState('day');
+  const [featuredMovieTitle, setFeaturedMovieTitle] = useState(' ');
   const [featuredMovieID, setFeaturedMovieID] = useState('');
-  const [featuredMovieImage, setFeaturedMovieImage] = useState('');
+  const [featuredMoviePoster, setFeaturedMoviePoster] = useState('');
+  const [featuredMovieBackdrop, setFeaturedMovieBackdrop] = useState('');
   const [genres, setGenres] = useState<string[]>([]);
   const [trending, setTrending] = useState<null | Array<Object>>(null);
   const [topRated, setTopRated] = useState<null | Array<Object>>(null);
   const [actors, setActors] = useState<null | Array<Object>>(null);
   const navigate = useNavigate();
-  const urlForImageFetch = 'https://image.tmdb.org/t/p/original';
+  const urlForImage = 'https://image.tmdb.org/t/p/original';
   useEffect(() => {
     loadFeatured(
-      setFeaturedMovieImage,
+      setFeaturedMovieTitle,
+      setFeaturedMoviePoster,
+      setFeaturedMovieBackdrop,
       setFeaturedMovieID,
       setGenres,
       mediaType,
@@ -39,7 +43,9 @@ const Home = ({ searchInput, setSearchInput }: IHome) => {
   }, []);
   useEffect(() => {
     loadFeatured(
-      setFeaturedMovieImage,
+      setFeaturedMovieTitle,
+      setFeaturedMoviePoster,
+      setFeaturedMovieBackdrop,
       setFeaturedMovieID,
       setGenres,
       mediaType,
@@ -50,62 +56,60 @@ const Home = ({ searchInput, setSearchInput }: IHome) => {
   }, [mediaType, timeWindow]);
 
   return (
-    <div className="flex flex-col w-screen min-h-screen bg-black gap-10 overflow-x-hidden">
-      <header className="flex flex-col gap-10 w-screen pl-5 pr-5">
-        <div className="w-full h-[65vh] relative rounded-lg overflow-hidden">
-          <img
-            className="absolute -top-16 rounded-b-lg"
-            src={featuredMovieImage}
-            alt=" "
-          />
-          <Link
-            to={`${mediaType}/${featuredMovieID}`}
-            className="absolute top-0 w-full h-5/6"
-          ></Link>
-          <div className="absolute flex-col flex-wrap bottom-0 w-full flex h-1/5 justify-evenly items-center pr-5 pl-5 backdrop-blur-lg">
-            <div className="flex flex-row justify-evenly w-full items-center">
-              {genres &&
-                genres.map((element, index) => {
-                  if (index + 1 === genres.length) {
-                    return <span className="text-white">{element}</span>;
-                  } else {
-                    return (
-                      <>
-                        <span className="text-white">{element}</span>
-                        <BsDot className="text-white" />
-                      </>
-                    );
-                  }
-                })}
-            </div>
-            <div className="w-full h-10 flex justify-between gap-5">
-              <button
-                onClick={() => {
-                  navigate(`movie/${featuredMovieID}`);
-                }}
-                className="bg-white w-full h-full rounded-lg"
-              >
-                Show
-              </button>
-              <button className="bg-white w-full h-full rounded-lg">
-                Add to list
-              </button>
+    <div className="flex flex-col w-full min-h-screen bg-black gap-10 overflow-x-hidden">
+      <header className="flex flex-col gap-10 w-full pl-5 pr-5">
+        <Link
+          className="flex flex-col gap-2.5"
+          to={`${mediaType}/${featuredMovieID}`}
+        >
+          <div className="flex flex-col gap-2.5 w-full justify-center items-center">
+            <div className="w-full h-full relative overflow-hidden rounded-lg max-h-[60vh]">
+              <div className="absolute h-full md:w-48 w-full bg-black md:bg-inherit md:from-black md:via-black bg-gradient-to-r"></div>
+              <div className="absolute h-full w-full flex justify-center md:justify-start items-center">
+                <img
+                  className="rounded-lg h-full md:h-2/4 2xl:h-3/4"
+                  src={`${urlForImage}${featuredMoviePoster}`}
+                  alt=""
+                />
+              </div>
+              <div className="flex justify-center">
+                <img
+                  className="ml-2.5 rounded-lg max-w-screen-lg h-full"
+                  src={`${urlForImage}${featuredMovieBackdrop}`}
+                />
+              </div>
+              <div className="flex absolute bottom-0 backdrop-blur-lg flex-row justify-center gap-2.5 w-full items-center">
+                {genres &&
+                  genres.map((element, index) => {
+                    if (index + 1 === genres.length) {
+                      return <span className="text-white">{element}</span>;
+                    } else {
+                      return (
+                        <>
+                          <span className="text-white">{element}</span>
+                          <BsDot className="text-white" />
+                        </>
+                      );
+                    }
+                  })}
+              </div>
             </div>
           </div>
-        </div>
+          <p className="text-white text-xl text-center">{featuredMovieTitle}</p>
+        </Link>
         <form
           onSubmit={(e: React.FormEvent) => {
             e.preventDefault();
             if (searchInput.length === 0) return;
             navigate(`/search/movie/${searchInput}`);
           }}
-          className="flex flex-col gap-2.5"
+          className="flex flex-col gap-2.5 md:items-center"
         >
           <h1 className="text-white text-3xl">Welcome</h1>
           <h3 className="text-white ">
             Millions of movies, TV shows and people to discover. Explore now.
           </h3>
-          <label className="flex w-full bg-white rounded-lg overflow-hidden p-1">
+          <label className="flex w-full max-w-screen-sm bg-white rounded-lg overflow-hidden p-1">
             <input
               onChange={(e: React.FormEvent<HTMLInputElement>) => {
                 setSearchInput(e.currentTarget.value);
@@ -189,7 +193,7 @@ const Home = ({ searchInput, setSearchInput }: IHome) => {
             </button>
           </div>
         </div>
-        <div className="flex w-full h-[300px] overflow-x-scroll transition-all">
+        <div className="flex w-full h-fit overflow-x-scroll transition-all md:overflow-visible md:grid md:gap-2.5  md:grid-cols-[repeat(auto-fill,_minmax(180px,_1fr))]">
           {trending &&
             trending.map(
               (object: {
@@ -199,12 +203,15 @@ const Home = ({ searchInput, setSearchInput }: IHome) => {
                 original_name?: string;
                 known_for_department?: string;
               }) => (
-                <Link to={`${mediaType}/${object.id}`}>
-                  <div className="w-44 h-[300px] flex-shrink-0 pr-3">
+                <Link
+                  className="flex justify-center"
+                  to={`${mediaType}/${object.id}`}
+                >
+                  <div className="w-44 h-fit flex-shrink-0 pr-3 md:pr-0">
                     {object.poster_path ? (
                       <img
                         className="h-5/6  rounded-lg object-fill "
-                        src={`${urlForImageFetch}${object.poster_path}`}
+                        src={`${urlForImage}${object.poster_path}`}
                         alt=""
                       />
                     ) : (
@@ -233,15 +240,18 @@ const Home = ({ searchInput, setSearchInput }: IHome) => {
         {mediaType !== 'person' ? (
           <>
             <p className="text-white text-4xl">Top Rated</p>
-            <div className="flex w-full overflow-x-scroll">
+            <div className="flex w-full overflow-x-scroll md:overflow-visible md:grid md:gap-2.5  md:grid-cols-[repeat(auto-fill,_minmax(180px,_1fr))]">
               {topRated &&
                 topRated.map(
                   (object: { poster_path?: string; id?: number }) => (
-                    <Link to={`movie/${object.id}`}>
-                      <div className="w-44 flex-shrink-0 pr-3">
+                    <Link
+                      className="flex justify-center"
+                      to={`movie/${object.id}`}
+                    >
+                      <div className="w-44 h-fit flex-shrink-0 pr-3 md:pr-0">
                         <img
-                          className="  rounded-lg object-fill "
-                          src={urlForImageFetch + object.poster_path}
+                          className=" rounded-lg object-fill "
+                          src={urlForImage + object.poster_path}
                           alt=""
                         />
                       </div>
@@ -253,7 +263,7 @@ const Home = ({ searchInput, setSearchInput }: IHome) => {
         ) : null}
 
         <p className="text-white text-4xl">Popular Actors</p>
-        <div className="flex w-full overflow-x-scroll">
+        <div className="flex w-full overflow-x-scroll md:overflow-visible md:grid md:gap-2.5 md:grid-cols-[repeat(auto-fill,_minmax(180px,_1fr))]">
           {actors &&
             actors.map(
               (object: {
@@ -261,12 +271,15 @@ const Home = ({ searchInput, setSearchInput }: IHome) => {
                 name?: string;
                 id?: number;
               }) => (
-                <Link to={`person/${object.id}`}>
+                <Link
+                  className="flex justify-center"
+                  to={`person/${object.id}`}
+                >
                   <div className="flex flex-col gap-1">
-                    <div className="w-44 flex-shrink-0 pr-3 relative">
+                    <div className="w-44 h-fit flex-shrink-0 pr-3 md:pr-0">
                       <img
                         className="rounded-lg object-fill"
-                        src={urlForImageFetch + object.profile_path}
+                        src={urlForImage + object.profile_path}
                         alt=""
                       />
                     </div>

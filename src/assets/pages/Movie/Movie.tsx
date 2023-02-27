@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import { AiOutlinePlayCircle } from 'react-icons/ai';
-import { BsDot, BsFillArrowRightCircleFill } from 'react-icons/bs';
+import {
+  BsDot,
+  BsFillArrowDownCircleFill,
+  BsFillArrowRightCircleFill,
+} from 'react-icons/bs';
 import { Link, useParams } from 'react-router-dom';
 import {
   getCredits,
@@ -123,30 +127,31 @@ const Movie = () => {
     );
   }, [maxCastVisible]);
 
-  const windowWidth = window.innerWidth - 50;
-  const windowHeight = windowWidth * (3 / 4);
-
+  const windowWidth = window.innerWidth > 1536 ? 1536 : window.innerWidth - 50;
+  const windowHeight = windowWidth / (16 / 9);
   return (
-    <div className="flex flex-col w-screen min-h-screen overflow-hidden pl-5 pr-5 bg-black gap-7">
-      <header className="w-full h-1/4 relative overflow-hidden rounded-lg ">
-        <div className="absolute h-full w-48 from-black via-black bg-gradient-to-r"></div>
-        <div className="absolute h-full flex justify-start items-center">
+    <div className="flex flex-col w-full min-h-screen overflow-hidden pl-5 pr-5 bg-black gap-7">
+      <header className="w-full h-full relative overflow-hidden rounded-lg max-h-[60vh] ">
+        <div className="absolute h-full md:w-48 w-full bg-black md:bg-inherit md:from-black md:via-black bg-gradient-to-r"></div>
+        <div className="absolute h-full w-full flex justify-center md:justify-start items-center">
           {dataDetails.poster_path && (
             <img
-              className="rounded-lg h-3/4"
+              className="rounded-lg h-full md:h-2/4 2xl:h-3/4"
               src={`${urlForImage}${dataDetails.poster_path}`}
               alt=""
             />
           )}
         </div>
         {dataDetails.backdrop_path && (
-          <img
-            className="ml-2.5 rounded-lg"
-            src={`${urlForImage}${dataDetails.backdrop_path}`}
-          ></img>
+          <div className="flex justify-center max-h-[60vh]">
+            <img
+              className="ml-2.5 rounded-lg max-w-screen-lg"
+              src={`${urlForImage}${dataDetails.backdrop_path}`}
+            ></img>
+          </div>
         )}
       </header>
-      <main className="flex flex-col w-full gap-6">
+      <main className="flex flex-col w-full gap-6 md:gap-10">
         <div className="w-full  ">
           <h1 className="text-white text-center text-3xl">
             {dataDetails.original_name
@@ -155,30 +160,31 @@ const Movie = () => {
             {` (${fullRelease})`}
           </h1>
         </div>
-        <div className="flex gap-2.5">
-          <div className="w-full">
+        <div className="flex gap-2.5 md:flex-col">
+          <div className="flex flex-col gap-1 w-full">
             <p className="text-white">Community Score:</p>
             <p className="text-white">
               {dataDetails.vote_average && dataDetails.vote_average.toFixed(1)}
               /10
             </p>
+            <p className="text-white">
+              Votes: {dataDetails.vote_count && dataDetails.vote_count}
+            </p>
           </div>
-          <div className="w-full pl-10">
+          <div className="w-full pl-10 md:pl-0">
             <Link
               to={
                 dataDetails.homepage !== undefined ? dataDetails.homepage : ' '
               }
             >
-              <button className="text-xl bg-white w-full h-full rounded-lg flex justify-center items-center gap-2.5">
+              <button className="text-xl bg-white w-full md:pl-5 md:pr-5 pt-2.5 pb-2.5 md:w-fit   rounded-lg flex justify-center items-center gap-2.5">
                 Watch <AiOutlinePlayCircle className="text-xl" />
               </button>
             </Link>
           </div>
         </div>
-        <p className="text-white">
-          Votes: {dataDetails.vote_count && dataDetails.vote_count}
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-1 border-2">
+
+        <div className="flex flex-wrap md:w-fit items-center justify-center gap-1 border-2">
           <span className="text-white">
             {dataDetails.first_air_date
               ? dataDetails.first_air_date
@@ -198,8 +204,10 @@ const Movie = () => {
           </div>
         </div>
         <p className="text-slate-400 italic">{dataDetails.tagline}</p>
-        <p className="text-3xl text-white">Description</p>
-        <p className="text-white">{dataDetails.overview}</p>
+        <div className="flex flex-col gap-2.5">
+          <p className="text-3xl text-white">Description</p>
+          <p className="text-white">{dataDetails.overview}</p>
+        </div>
         {director &&
           director.map((object: { original_name?: string; job?: string }) => {
             return (
@@ -210,7 +218,7 @@ const Movie = () => {
             );
           })}
         <p className="text-3xl text-white">Cast</p>
-        <div className="flex w-full overflow-x-scroll">
+        <div className="flex w-full overflow-x-scroll md:overflow-visible md:grid md:gap-2.5 md:gap-y-5 md:justify-items-center  md:grid-cols-[repeat(auto-fill,_minmax(180px,_1fr))]">
           {cast &&
             cast.map(
               (object: {
@@ -220,8 +228,11 @@ const Movie = () => {
                 id?: number;
               }) => {
                 return (
-                  <Link to={`/person/${object.id}`}>
-                    <div className="flex flex-col min-h-full justify-between w-44 border-2 flex-shrink-0 mr-3 rounded-lg">
+                  <Link
+                    className="flex justify-center w-fit"
+                    to={`/person/${object.id}`}
+                  >
+                    <div className="flex flex-col min-h-full justify-between w-44 border-2 flex-shrink-0 mr-3 md:mr-0 rounded-lg">
                       {typeof object.profile_path === 'string' ? (
                         <img
                           className="object-cover rounded-t-lg"
@@ -250,7 +261,7 @@ const Movie = () => {
               }
             )}
           {loadMoreCastBtn && (
-            <div className="flex justify-center items-center">
+            <div className="flex md:hidden justify-center items-center md:rotate-90 md:pt-10">
               <BsFillArrowRightCircleFill
                 onClick={() => {
                   let maxNumber = maxCastVisible;
@@ -262,11 +273,23 @@ const Movie = () => {
             </div>
           )}
         </div>
-        <div className="flex flex-col w-full">
+        {loadMoreCastBtn && (
+          <div className="hidden md:flex w-full justify-center items-center md:w-full">
+            <BsFillArrowDownCircleFill
+              onClick={() => {
+                let maxNumber = maxCastVisible;
+                maxNumber += 10;
+                setMaxCastVisible(maxNumber);
+              }}
+              className="text-white text-5xl md:hover:animate-bounce"
+            />
+          </div>
+        )}
+        <div className="flex flex-col w-full  gap-2.5">
           {videos !== null && videos.length > 0 ? (
             <>
               <p className="text-white text-3xl ">Videos</p>
-              <div className="flex gap-5 w-full overflow-x-scroll transition-all">
+              <div className="flex gap-5 w-full overflow-x-scroll transition-all scrollbar scrollbar-track-slate-500 scrollbar-track-rounded-lg scrollbar-thumb-slate-300 scrollbar-thumb-rounded-lg">
                 {videos.map((object) => (
                   <div className="flex justify-center items-center w-full flex-shrink-0">
                     <iframe
@@ -294,7 +317,7 @@ const Movie = () => {
           ) : null}
         </div>
         <p className="text-white text-3xl ">Posters</p>
-        <div className="flex overflow-x-scroll">
+        <div className="flex w-full overflow-x-scroll md:overflow-visible md:grid md:gap-2.5 md:gap-y-5 md:justify-items-center  md:grid-cols-[repeat(auto-fill,_minmax(180px,_1fr))]">
           {images &&
             images.map((object) => (
               <div className="w-44 max-h-[250px] flex-shrink-0 pr-3 overflow-hidden">
@@ -306,7 +329,7 @@ const Movie = () => {
               </div>
             ))}
           {loadMorePostersBtn && (
-            <div className="flex justify-center items-center">
+            <div className="md:hidden flex justify-center items-center">
               <BsFillArrowRightCircleFill
                 onClick={() => {
                   let maxNumber = maxPostersVisible;
@@ -318,10 +341,22 @@ const Movie = () => {
             </div>
           )}
         </div>
+        {loadMorePostersBtn && (
+          <div className="hidden md:flex  justify-center items-center">
+            <BsFillArrowDownCircleFill
+              onClick={() => {
+                let maxNumber = maxPostersVisible;
+                maxNumber += 10;
+                setMaxPostersVisible(maxNumber);
+              }}
+              className="text-white text-5xl md:hover:animate-bounce "
+            />
+          </div>
+        )}
         {similar.length > 0 ? (
           <>
             <p className="text-white text-3xl ">Similar</p>
-            <div className="flex overflow-x-scroll">
+            <div className="flex w-full overflow-x-scroll md:overflow-visible md:grid md:gap-2.5 md:gap-y-5 md:justify-items-center  md:grid-cols-[repeat(auto-fill,_minmax(180px,_1fr))]">
               {similar.map(
                 (object: {
                   id?: number;

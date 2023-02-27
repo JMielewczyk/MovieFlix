@@ -149,7 +149,7 @@ const List = () => {
     <div
       ref={divRef}
       onScroll={handleLoadOnScroll}
-      className="flex flex-col w-screen max-h-[calc(100vh_-_5rem)] overflow-y-scroll pl-5 pr-5 bg-black gap-7"
+      className="flex flex-col w-full max-h-[calc(80vh_-_5rem)] overflow-y-scroll pl-5 pr-5 bg-black gap-7 scrollbar scrollbar-track-slate-500 scrollbar-track-rounded-lg scrollbar-thumb-slate-300 scrollbar-thumb-rounded-lg"
     >
       <header>
         <form>
@@ -182,66 +182,62 @@ const List = () => {
           </label>
         </form>
       </header>
-      <div>
-        <div
-          className={
-            type === 'person'
-              ? 'grid place-items-center gap-4 grid-cols-2'
-              : 'flex flex-col gap-5'
-          }
-        >
-          {data &&
-            data.map((object) => {
-              return (
-                <Link
+      <div
+        className={
+          type === 'person'
+            ? 'grid w-full place-items-center gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
+            : 'grid gap-5 grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))]'
+        }
+      >
+        {data &&
+          data.map((object) => {
+            return (
+              <Link
+                className={
+                  type === 'person' ? 'flex justify-center w-fit' : ' '
+                }
+                to={`/${type}/${object.id}`}
+              >
+                <div
                   className={
-                    type === 'person' ? 'flex justify-center w-fit' : ' '
+                    object.poster_path
+                      ? 'flex w-full border-2 h-40 rounded-lg'
+                      : 'flex flex-col justify-center items-center w-40 border-2 h-64 rounded-lg'
                   }
-                  to={`/${type}/${object.id}`}
                 >
-                  <div
+                  <img
                     className={
                       object.poster_path
-                        ? 'flex w-full border-2 h-40 rounded-lg'
-                        : 'flex flex-col justify-center items-center w-40 border-2 h-64 rounded-lg'
+                        ? 'h-full rounded-l-lg'
+                        : 'w-32 rounded-lg'
                     }
-                  >
-                    <img
-                      className={
-                        object.poster_path
-                          ? 'h-full rounded-l-lg'
-                          : 'w-32 rounded-lg'
-                      }
-                      src={`${urlForImage}${
-                        object.poster_path
-                          ? object.poster_path
-                          : object.profile_path
-                      }`}
-                      alt=""
-                    />
-                    <div className="flex flex-col justify-center p-2">
-                      <div className="h-3/5">
-                        <p className="text-white line-clamp-2">
-                          {object.title ? object.title : object.name}
-                        </p>
-                        <p className="text-white">
-                          {object.release_date
-                            ? object.release_date
-                            : object.first_air_date}
-                        </p>
-                      </div>
+                    src={`${urlForImage}${
+                      object.poster_path
+                        ? object.poster_path
+                        : object.profile_path
+                    }`}
+                    alt=""
+                  />
+                  <div className="flex flex-col justify-center p-2">
+                    <div className="h-3/5">
                       <p className="text-white line-clamp-2">
-                        {object.overview}
+                        {object.title ? object.title : object.name}
+                      </p>
+                      <p className="text-white">
+                        {object.release_date
+                          ? object.release_date
+                          : object.first_air_date}
                       </p>
                     </div>
+                    <p className="text-white line-clamp-2">{object.overview}</p>
                   </div>
-                </Link>
-              );
-            })}
-          <div className="flex justify-center items-center">
-            <BsArrowDownCircle className="text-white text-5xl animate-bounce" />
-          </div>
-        </div>
+                </div>
+              </Link>
+            );
+          })}
+      </div>
+      <div className="flex justify-center items-center">
+        <BsArrowDownCircle className="text-white text-5xl animate-bounce" />
       </div>
     </div>
   );
