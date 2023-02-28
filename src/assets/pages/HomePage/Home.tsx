@@ -7,7 +7,7 @@ import {
   loadPopularActors,
   loadTopRated,
   loadTrending,
-} from '../../utils/fetchFunctions';
+} from './features';
 
 interface IHome {
   searchInput: string;

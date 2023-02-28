@@ -1,30 +1,18 @@
 import { useEffect, useState } from 'react';
 import { FaRegSadCry } from 'react-icons/fa';
 import { Link, useParams } from 'react-router-dom';
+import { loadContent } from './features';
 import { IdataObject } from './interfaces';
 
 const SearchList = () => {
   const { type, query } = useParams();
-  const API_KEY = import.meta.env.VITE_API_KEY;
-  const urlToApi = 'https://api.themoviedb.org/3';
   const urlForImage = 'https://image.tmdb.org/t/p/original';
   const [data, setData] = useState<Array<IdataObject>>([]);
   const [pages, setPages] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   useEffect(() => {
-    const loadContent = async () => {
-      const res = await fetch(
-        `${urlToApi}/search/${type}?api_key=${API_KEY}&query=${query}&page=${currentPage}`
-      );
-      const data = await res.json();
-      let pages: number[] = [];
-      for (let i = 1; i <= data.total_pages; i++) {
-        pages = [...pages, i];
-      }
-      setPages(pages);
-      setData(data.results);
-    };
-    loadContent();
+    loadContent(type, query, currentPage, setPages, setData);
+    console.log(data);
   }, []);
 
   useEffect(() => {
@@ -32,56 +20,16 @@ const SearchList = () => {
       top: 0,
       behavior: 'smooth',
     });
-
-    const loadContent = async () => {
-      const currentPage = 1;
-      const res = await fetch(
-        `${urlToApi}/search/${type}?api_key=${API_KEY}&query=${query}&page=${currentPage}`
-      );
-      const data = await res.json();
-      let pages: number[] = [];
-      for (let i = 1; i <= data.total_pages; i++) {
-        pages = [...pages, i];
-      }
-      //Change property name to match the same name for each type(movie, tv, person)
-      for (let object in data.results) {
-        if (!data.results[object].hasOwnProperty('poster_path')) {
-          data.results[object].poster_path = data.results[object].profile_path;
-          delete data.results[object].profile_path;
-        }
-      }
-      setPages(pages);
-      setData(data.results);
-      setCurrentPage(1);
-    };
-    loadContent();
+    loadContent(type, query, 1, setPages, setData); // nr 1 is setting current page to 1
+    setCurrentPage(1);
   }, [type, query]);
 
   useEffect(() => {
-    const loadContent = async () => {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth',
-      });
-      const res = await fetch(
-        `${urlToApi}/search/${type}?api_key=${API_KEY}&query=${query}&page=${currentPage}`
-      );
-      const data = await res.json();
-      let pages: number[] = [];
-      for (let i = 1; i <= data.total_pages; i++) {
-        pages = [...pages, i];
-      }
-      //Change property name to match the same name for each type(movie, tv, person)
-      for (let object in data.results) {
-        if (!data.results[object].hasOwnProperty('poster_path')) {
-          data.results[object].poster_path = data.results[object].profile_path;
-          delete data.results[object].profile_path;
-        }
-      }
-      setPages(pages);
-      setData(data.results);
-    };
-    loadContent();
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+    loadContent(type, query, currentPage, setPages, setData);
   }, [currentPage]);
 
   return (

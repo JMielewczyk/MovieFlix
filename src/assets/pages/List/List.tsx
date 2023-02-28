@@ -1,6 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { BsArrowDownCircle } from 'react-icons/bs';
 import { Link, useParams } from 'react-router-dom';
+import {
+  handleLoadOnScroll,
+  handleSelect,
+  loadPopular,
+  loadPopularSort,
+} from './features';
 import { IdataObject } from './interfaces';
 
 const sortingOptions = {
@@ -11,9 +17,6 @@ const sortingOptions = {
 };
 
 const List = () => {
-  const API_KEY = import.meta.env.VITE_API_KEY;
-  const urlToApi = 'https://api.themoviedb.org/3';
-  const urlForImage = 'https://image.tmdb.org/t/p/original';
   const { category, type } = useParams();
   const [data, setData] = useState<Array<IdataObject>>([]);
   const [pageNumber, setPageNumber] = useState(1);
@@ -26,16 +29,10 @@ const List = () => {
     ratingIncreasing,
     ratingDecreasing,
   } = sortingOptions;
+  const urlForImage = 'https://image.tmdb.org/t/p/original';
   useEffect(() => {
     //loading elements after first render
-    const loadPopular = async () => {
-      const res = await fetch(
-        `${urlToApi}/${type}/${category}?api_key=${API_KEY}&page=${pageNumber}`
-      );
-      const object = await res.json();
-      setData(object.results);
-    };
-    loadPopular();
+    loadPopular(type, category, pageNumber, setData);
   }, []);
 
   useEffect(() => {
@@ -44,112 +41,43 @@ const List = () => {
     }
     const pageNumber = 1; // setting variable instead of state pageNumber to fix loading categories not matching in one element
     setSortBy('popularityDecreasing');
-    const loadPopular = async () => {
-      const res = await fetch(
-        `${urlToApi}/${type}/${category}?api_key=${API_KEY}&page=${pageNumber}`
-      );
-      const object = await res.json();
-      setData(object.results);
-    };
+    loadPopular(type, category, pageNumber, setData);
     setPageNumber(1); // setting state now will prevent taking the wrong pageNumber when changing category or type
-    loadPopular();
   }, [category, type]);
 
   useEffect(() => {
-    //fetching more elements to page after scrolling to bottom of the div
-    const loadPopular = async () => {
-      const res = await fetch(
-        `${urlToApi}/${type}/${category}?api_key=${API_KEY}&page=${pageNumber}`
-      );
-      const object = await res.json();
-
-      const sortData = () => {
-        if (sortBy === popularityDecreasing) {
-          return object.results.sort(
-            (a: { popularity: number }, b: { popularity: number }) =>
-              a.popularity < b.popularity
-                ? 1
-                : a.popularity > b.popularity
-                ? -1
-                : 0
-          );
-        } else if (sortBy === popularityIncreasing) {
-          return object.results.sort(
-            (a: { popularity: number }, b: { popularity: number }) =>
-              a.popularity - b.popularity
-          );
-        } else if (sortBy === ratingIncreasing) {
-          return object.results.sort(
-            (a: { vote_average: number }, b: { vote_average: number }) =>
-              a.vote_average - b.vote_average
-          );
-        } else if (sortBy === ratingDecreasing) {
-          return object.results.sort(
-            (a: { vote_average: number }, b: { vote_average: number }) =>
-              a.vote_average < b.vote_average
-                ? 1
-                : a.vote_average > b.vote_average
-                ? -1
-                : 0
-          );
-        }
-      };
-
-      if (pageNumber > 1 && pageNumber < maxPages) {
-        const sortedData = sortData();
-        const newArray = [...data, ...sortedData];
-        setData(newArray);
-      } else {
-        const sortedData = sortData();
-        setData(sortedData);
-      }
-    };
-    loadPopular();
+    //fetching more elements to page after scrolling to bottom of the div and sorting new elements
+    loadPopularSort(
+      type,
+      category,
+      pageNumber,
+      setData,
+      sortBy,
+      popularityDecreasing,
+      popularityIncreasing,
+      ratingIncreasing,
+      ratingDecreasing,
+      maxPages,
+      data
+    );
   }, [pageNumber, sortBy]);
-
-  const handleSelect = async (event: React.FormEvent<HTMLSelectElement>) => {
-    event.preventDefault();
-    const selectOption = event.currentTarget.value;
-
-    if (
-      selectOption === popularityDecreasing ||
-      selectOption === ratingDecreasing
-    ) {
-      setSortBy(selectOption);
-      setPageNumber(1);
-    } else if (
-      selectOption === popularityIncreasing ||
-      selectOption === ratingIncreasing
-    ) {
-      setSortBy(selectOption);
-      setPageNumber(maxPages);
-    }
-  };
-
-  const handleLoadOnScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    //calculating bottom of the scrolling div, after that setting pageNumber that triggers useEffect to load more on the page/div
-    const containerHeight = e.currentTarget.clientHeight;
-    const scrollHeight = e.currentTarget.scrollHeight;
-    const scrollTop = e.currentTarget.scrollTop;
-    if (((scrollTop + containerHeight) / scrollHeight) * 100 === 100) {
-      let newPageNumber = pageNumber;
-      if (sortBy === popularityDecreasing || sortBy === ratingDecreasing) {
-        newPageNumber++;
-      } else if (
-        sortBy === popularityIncreasing ||
-        sortBy === ratingIncreasing
-      ) {
-        newPageNumber--;
-      }
-      setPageNumber(newPageNumber);
-    }
-  };
 
   return (
     <div
       ref={divRef}
-      onScroll={handleLoadOnScroll}
-      className="flex flex-col w-full max-h-[calc(80vh_-_5rem)] overflow-y-scroll pl-5 pr-5 bg-black gap-7 scrollbar scrollbar-track-slate-500 scrollbar-track-rounded-lg scrollbar-thumb-slate-300 scrollbar-thumb-rounded-lg"
+      onScroll={(e) =>
+        handleLoadOnScroll(
+          e,
+          pageNumber,
+          sortBy,
+          popularityDecreasing,
+          popularityIncreasing,
+          ratingDecreasing,
+          ratingIncreasing,
+          setPageNumber
+        )
+      }
+      className="flex flex-col w-full xl:max-h-[calc(87vh_-_5rem)] max-h-[calc(100vh_-_5rem)] overflow-y-scroll pl-5 pr-5 bg-black gap-7 scrollbar scrollbar-track-slate-500 scrollbar-track-rounded-lg scrollbar-thumb-slate-300 scrollbar-thumb-rounded-lg"
     >
       <header>
         <form>
@@ -162,7 +90,18 @@ const List = () => {
             </span>
             <select
               value={sortBy}
-              onChange={handleSelect}
+              onChange={(e) =>
+                handleSelect(
+                  e,
+                  popularityDecreasing,
+                  popularityIncreasing,
+                  ratingDecreasing,
+                  ratingIncreasing,
+                  setSortBy,
+                  setPageNumber,
+                  maxPages
+                )
+              }
               id="sortBy"
               className="bg-black border p-1"
             >
