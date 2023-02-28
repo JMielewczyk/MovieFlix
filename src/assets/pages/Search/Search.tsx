@@ -11,7 +11,7 @@ interface ISearch {
 const Search = ({ searchInput, setSearchInput }: ISearch) => {
   const navigate = useNavigate();
   return (
-    <div className="flex flex-col w-screen min-h-screen bg-black gap-10 overflow-x-hidden">
+    <div className="flex flex-col w-full min-h-screen bg-black gap-10 overflow-x-hidden">
       <header className="pl-5 pr-5">
         <form
           onSubmit={(e: React.FormEvent) => {

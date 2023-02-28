@@ -86,12 +86,11 @@ const SearchList = () => {
 
   return (
     <div className="flex flex-col">
-      {' '}
       <div
         className={
           type === 'person'
-            ? 'grid place-items-center gap-4 grid-cols-2'
-            : 'flex flex-col gap-5'
+            ? 'grid w-full place-items-center gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
+            : 'grid gap-5 grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))]'
         }
       >
         {data.length === 0 ? (
