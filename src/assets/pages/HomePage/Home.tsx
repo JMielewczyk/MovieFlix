@@ -193,7 +193,7 @@ const Home = ({ searchInput, setSearchInput }: IHome) => {
             </button>
           </div>
         </div>
-        <div className="flex w-full h-fit overflow-x-scroll transition-all md:overflow-visible md:grid md:gap-2.5  md:grid-cols-[repeat(auto-fill,_minmax(180px,_1fr))]">
+        <div className="flex w-full overflow-x-scroll md:overflow-visible md:grid md:gap-2.5  md:grid-cols-[repeat(auto-fill,_minmax(180px,_1fr))]">
           {trending &&
             trending.map(
               (object: {
@@ -210,7 +210,7 @@ const Home = ({ searchInput, setSearchInput }: IHome) => {
                   <div className="w-44 h-fit flex-shrink-0 pr-3 md:pr-0">
                     {object.poster_path ? (
                       <img
-                        className="h-5/6  rounded-lg object-fill "
+                        className="rounded-lg object-fill "
                         src={`${urlForImage}${object.poster_path}`}
                         alt=""
                       />
