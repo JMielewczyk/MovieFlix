@@ -1,7 +1,12 @@
+//Hooks
 import { useEffect, useState } from 'react';
-import { FaRegSadCry } from 'react-icons/fa';
+//React Router
 import { Link, useParams } from 'react-router-dom';
+//React Icons
+import { FaRegSadCry } from 'react-icons/fa';
+//Utils
 import { loadContent } from './features';
+//Interfaces
 import { IdataObject } from './interfaces';
 
 const SearchList = () => {
@@ -12,7 +17,6 @@ const SearchList = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   useEffect(() => {
     loadContent(type, query, currentPage, setPages, setData);
-    console.log(data);
   }, []);
 
   useEffect(() => {
@@ -49,6 +53,7 @@ const SearchList = () => {
           data.map((object) => {
             return (
               <Link
+                key={object.id}
                 className={
                   type !== 'person' ? 'flex w-full justify-center' : ' '
                 }
@@ -110,10 +115,15 @@ const SearchList = () => {
           if (page <= currentPage && page >= currentPage - 5) {
             return (
               <button
+                key={page}
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   setCurrentPage(Number(e.currentTarget.textContent));
                 }}
-                className="text-white flex-grow text-center"
+                className={
+                  page === currentPage
+                    ? 'text-green-400 flex-grow text-center '
+                    : 'text-white flex-grow text-center'
+                }
               >
                 {page}
               </button>
@@ -121,25 +131,37 @@ const SearchList = () => {
           } else if (page > currentPage && page <= currentPage + 4) {
             return (
               <button
+                key={page}
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   setCurrentPage(Number(e.currentTarget.textContent));
                 }}
-                className="text-white flex-grow text-center"
+                className={
+                  page === currentPage
+                    ? 'text-green-400 flex-grow text-center '
+                    : 'text-white flex-grow text-center'
+                }
               >
                 {page}
               </button>
             );
           } else if (page <= currentPage + 5 && page > currentPage - 5) {
             return (
-              <span className="text-white flex-grow text-center">...</span>
+              <span key={page} className="text-white flex-grow text-center">
+                ...
+              </span>
             );
           } else if (page >= pages.length - 1) {
             return (
               <button
+                key={page}
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   setCurrentPage(Number(e.currentTarget.textContent));
                 }}
-                className="text-white flex-grow text-center"
+                className={
+                  page === currentPage
+                    ? 'text-green-400 flex-grow text-center '
+                    : 'text-white flex-grow text-center'
+                }
               >
                 {page}
               </button>

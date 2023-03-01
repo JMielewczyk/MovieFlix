@@ -1,4 +1,15 @@
+//Hooks
 import { useEffect, useState } from 'react';
+//React Router
+import { Link, useParams } from 'react-router-dom';
+//Utils
+import {
+  getDetails,
+  getExternal,
+  getImages,
+  loadMoviesAndTV,
+} from './features';
+//React Icons
 import {
   AiFillTwitterSquare,
   AiOutlineArrowDown,
@@ -10,13 +21,7 @@ import {
   BsFillArrowRightCircleFill,
 } from 'react-icons/bs';
 import { FaRegSadCry } from 'react-icons/fa';
-import { Link, useParams } from 'react-router-dom';
-import {
-  getDetails,
-  getExternal,
-  getImages,
-  loadMoviesAndTV,
-} from './features';
+//Interfaces
 import { ICredits, IdataDetails, Iexternal } from './interfaces';
 
 const Actors = () => {
@@ -198,7 +203,7 @@ const Actors = () => {
             <p className="text-xl text-white ">Movies</p>
             <div className="flex w-full overflow-x-scroll overflow-y-hidden md:overflow-x-visible md:grid md:gap-2.5 md:gap-y-5 md:justify-items-center  md:grid-cols-[repeat(auto-fill,_minmax(180px,_1fr))]">
               {movieCredits.map((object) => (
-                <Link to={`/movie/${object.id}`}>
+                <Link key={object.id} to={`/movie/${object.id}`}>
                   <div className="flex flex-col justify-between w-44 h-[300px] border-2 flex-shrink-0 mr-3 rounded-lg">
                     {typeof object.poster_path === 'string' ? (
                       <img
@@ -256,7 +261,7 @@ const Actors = () => {
             <p className="text-xl text-white ">TV Shows</p>
             <div className="flex w-full overflow-x-scroll overflow-y-hidden md:overflow-x-visible md:grid md:gap-2.5 md:gap-y-5 md:justify-items-center  md:grid-cols-[repeat(auto-fill,_minmax(180px,_1fr))]">
               {tvCredits.map((object) => (
-                <Link to={`/tv/${object.id}`}>
+                <Link key={object.id} to={`/tv/${object.id}`}>
                   <div className="flex flex-col justify-between w-44 min-h-full border-2 flex-shrink-0 mr-3 rounded-lg">
                     {typeof object.poster_path === 'string' ? (
                       <img
@@ -323,7 +328,7 @@ const Actors = () => {
                   }
                 >
                   {movieTimeline.map((object) => (
-                    <Link to={`/movie/${object.id}`}>
+                    <Link key={object.id} to={`/movie/${object.id}`}>
                       <div className="flex gap-5 border-b border-slate-500 pl-2.5">
                         <div className="flex justify-center items-center ">
                           <p className="text-white">{object.release_date}</p>
@@ -372,7 +377,7 @@ const Actors = () => {
                   }
                 >
                   {tvTimeline.map((object) => (
-                    <Link to={`/tv/${object.id}`}>
+                    <Link key={object.id} to={`/tv/${object.id}`}>
                       <div className="flex gap-5 border-b border-slate-500 pl-2.5">
                         <div className="flex justify-center items-center ">
                           <p className="text-white">{object.first_air_date}</p>
@@ -416,8 +421,11 @@ const Actors = () => {
           <>
             <p className="text-white text-3xl">Profile pics</p>
             <div className="flex h-[300px] overflow-x-scroll scrollbar scrollbar-track-slate-500 scrollbar-track-rounded-lg scrollbar-thumb-slate-300 scrollbar-thumb-rounded-lg">
-              {images.map((object: { file_path?: string }) => (
-                <div className="w-44 h-full  flex-shrink-0 mr-3">
+              {images.map((object: { file_path?: string; id?: number }) => (
+                <div
+                  key={object.id}
+                  className="w-44 h-full  flex-shrink-0 mr-3"
+                >
                   <img
                     className="rounded-lg"
                     src={`${urlForImage}${object.file_path}`}

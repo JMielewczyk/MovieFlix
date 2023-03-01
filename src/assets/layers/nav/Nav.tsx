@@ -1,7 +1,10 @@
+//Hooks
 import React, { useEffect, useState } from 'react';
+//React Router
+import { Link } from 'react-router-dom';
+//Icons
 import { AiOutlineMenu } from 'react-icons/ai';
 import { ImCross } from 'react-icons/im';
-import { Link } from 'react-router-dom';
 
 const Nav = () => {
   const [isAsideOpen, setIsAsideOpen] = useState(false);

@@ -1,11 +1,16 @@
+//Hooks
 import { useEffect, useState } from 'react';
+//React Router
+import { Link, useParams } from 'react-router-dom';
+//React Icons
 import { AiOutlinePlayCircle } from 'react-icons/ai';
 import {
   BsDot,
   BsFillArrowDownCircleFill,
   BsFillArrowRightCircleFill,
 } from 'react-icons/bs';
-import { Link, useParams } from 'react-router-dom';
+import { FaRegSadCry } from 'react-icons/fa';
+//Utils
 import {
   getCredits,
   getDetails,
@@ -14,7 +19,7 @@ import {
   getSimilar,
   getVideos,
 } from './features';
-import { FaRegSadCry } from 'react-icons/fa';
+//Interfaces
 import { IdataDetails } from './interfaces';
 
 const Movie = () => {
@@ -25,7 +30,9 @@ const Movie = () => {
   const [director, setDirector] = useState<Object[]>([]);
   const [cast, setCast] = useState<Object[]>([]);
   const [images, setImages] = useState<null | { file_path?: string }[]>(null);
-  const [videos, setVideos] = useState<null | { key?: string }[]>(null);
+  const [videos, setVideos] = useState<null | { key?: string; id?: string }[]>(
+    null
+  );
   const [loadMoreCastBtn, setLoadMoreCastBtn] = useState(false);
   const [loadMorePostersBtn, setLoadMorePostersBtn] = useState(false);
   const [loadMoreVideosBtn, setLoadMoreVideosBtn] = useState(false);
@@ -196,9 +203,17 @@ const Movie = () => {
             {genres &&
               genres.map((element: { name?: string }, index: number) => {
                 if (index === genres.length - 1) {
-                  return <span className="text-white">{element.name}</span>;
+                  return (
+                    <span key={element.name} className="text-white">
+                      {element.name}
+                    </span>
+                  );
                 } else {
-                  return <span className="text-white">{element.name}, </span>;
+                  return (
+                    <span key={element.name} className="text-white">
+                      {element.name},{' '}
+                    </span>
+                  );
                 }
               })}
           </div>
@@ -209,14 +224,14 @@ const Movie = () => {
           <p className="text-white">{dataDetails.overview}</p>
         </div>
         {director &&
-          director.map((object: { original_name?: string; job?: string }) => {
-            return (
-              <div>
+          director.map(
+            (object: { original_name?: string; job?: string; id?: number }) => (
+              <div key={object.id}>
                 <p className="text-white font-bold">{object.original_name}</p>
                 <p className="text-white font-light ">{object.job}</p>
               </div>
-            );
-          })}
+            )
+          )}
         <p className="text-3xl text-white">Cast</p>
         <div className="flex w-full overflow-x-scroll md:overflow-visible md:grid md:gap-2.5 md:gap-y-5 md:justify-items-center  md:grid-cols-[repeat(auto-fill,_minmax(180px,_1fr))]">
           {cast &&
@@ -226,39 +241,38 @@ const Movie = () => {
                 name?: string;
                 character?: string;
                 id?: number;
-              }) => {
-                return (
-                  <Link
-                    className="flex justify-center w-fit"
-                    to={`/person/${object.id}`}
-                  >
-                    <div className="flex flex-col min-h-full justify-between w-44 border-2 flex-shrink-0 mr-3 md:mr-0 rounded-lg">
-                      {typeof object.profile_path === 'string' ? (
-                        <img
-                          className="object-cover rounded-t-lg"
-                          src={`${urlForImage}${object.profile_path}`}
-                          alt=""
-                        />
-                      ) : (
-                        <div className="flex flex-col flex-grow justify-center gap-5 items-center w-full pt-20 mb-10">
-                          <p className="text-white text-center">
-                            Sorry, no image for this person
-                          </p>
-                          <FaRegSadCry className="text-white text-5xl" />
-                        </div>
-                      )}
-                      <div className="w-full flex flex-grow flex-col justify-center items-center">
-                        <p className="text-white font-bold text-center">
-                          {object.name}
+              }) => (
+                <Link
+                  key={object.id}
+                  className="flex justify-center w-fit"
+                  to={`/person/${object.id}`}
+                >
+                  <div className="flex flex-col min-h-full justify-between w-44 border-2 flex-shrink-0 mr-3 md:mr-0 rounded-lg">
+                    {typeof object.profile_path === 'string' ? (
+                      <img
+                        className="object-cover rounded-t-lg"
+                        src={`${urlForImage}${object.profile_path}`}
+                        alt=""
+                      />
+                    ) : (
+                      <div className="flex flex-col flex-grow justify-center gap-5 items-center w-full pt-20 mb-10">
+                        <p className="text-white text-center">
+                          Sorry, no image for this person
                         </p>
-                        <p className="text-white font-light text-center">
-                          {object.character}
-                        </p>
+                        <FaRegSadCry className="text-white text-5xl" />
                       </div>
+                    )}
+                    <div className="w-full flex flex-grow flex-col justify-center items-center">
+                      <p className="text-white font-bold text-center">
+                        {object.name}
+                      </p>
+                      <p className="text-white font-light text-center">
+                        {object.character}
+                      </p>
                     </div>
-                  </Link>
-                );
-              }
+                  </div>
+                </Link>
+              )
             )}
           {loadMoreCastBtn && (
             <div className="flex md:hidden justify-center items-center md:rotate-90 md:pt-10">
@@ -291,7 +305,10 @@ const Movie = () => {
               <p className="text-white text-3xl ">Videos</p>
               <div className="flex gap-5 w-full overflow-x-scroll transition-all scrollbar scrollbar-track-slate-500 scrollbar-track-rounded-lg scrollbar-thumb-slate-300 scrollbar-thumb-rounded-lg">
                 {videos.map((object) => (
-                  <div className="flex justify-center items-center w-full flex-shrink-0">
+                  <div
+                    key={object.id}
+                    className="flex justify-center items-center w-full flex-shrink-0"
+                  >
                     <iframe
                       className="w-full"
                       width={`${windowWidth}`}
@@ -320,7 +337,10 @@ const Movie = () => {
         <div className="flex w-full overflow-x-scroll md:overflow-visible md:grid md:gap-2.5 md:gap-y-5 md:justify-items-center  md:grid-cols-[repeat(auto-fill,_minmax(180px,_1fr))]">
           {images &&
             images.map((object) => (
-              <div className="w-44 max-h-[250px] flex-shrink-0 pr-3 overflow-hidden">
+              <div
+                key={object.file_path}
+                className="w-44 max-h-[250px] flex-shrink-0 pr-3 overflow-hidden"
+              >
                 <img
                   className="rounded-lg object-fill"
                   src={`${urlForImage}${object.file_path}`}
@@ -364,7 +384,7 @@ const Movie = () => {
                   original_title?: string;
                   name?: string;
                 }) => (
-                  <Link to={`/${mediatype}/${object.id}`}>
+                  <Link key={object.id} to={`/${mediatype}/${object.id}`}>
                     <div className="w-44 h-[300px] flex-shrink-0 pr-3 overflow-hidden">
                       {object.poster_path ? (
                         <img
@@ -397,7 +417,7 @@ const Movie = () => {
         {recommended.length > 0 ? (
           <>
             <p className="text-white text-3xl ">Recommended</p>
-            <div className="flex overflow-x-scroll">
+            <div className="flex overflow-x-scroll scrollbar scrollbar-track-slate-500 scrollbar-track-rounded-lg scrollbar-thumb-slate-300 scrollbar-thumb-rounded-lg">
               {recommended.map(
                 (object: {
                   id?: number;
@@ -405,7 +425,7 @@ const Movie = () => {
                   original_title?: string;
                   name?: string;
                 }) => (
-                  <Link to={`/${mediatype}/${object.id}`}>
+                  <Link key={object.id} to={`/${mediatype}/${object.id}`}>
                     <div className="w-44 h-[300px] flex-shrink-0 pr-3 overflow-hidden">
                       {object.poster_path ? (
                         <img

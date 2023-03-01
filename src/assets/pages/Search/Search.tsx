@@ -1,12 +1,11 @@
-import { useContext } from 'react';
-import { BsSearch } from 'react-icons/bs';
+//React Router
 import { NavLink, Route, Routes, useNavigate } from 'react-router-dom';
+//React Icons
+import { BsSearch } from 'react-icons/bs';
+//Interfaces
+import { ISearch } from './interfaces';
+//Pages
 import SearchList from './SearchList/SearchList';
-
-interface ISearch {
-  searchInput: string;
-  setSearchInput: React.Dispatch<React.SetStateAction<string>>;
-}
 
 const Search = ({ searchInput, setSearchInput }: ISearch) => {
   const navigate = useNavigate();

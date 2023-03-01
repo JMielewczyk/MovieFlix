@@ -1,12 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { BsArrowDownCircle } from 'react-icons/bs';
+//Hooks
+import { useEffect, useRef, useState } from 'react';
+//React Router
 import { Link, useParams } from 'react-router-dom';
+//React Icons
+import { BsArrowDownCircle } from 'react-icons/bs';
+//Utils
 import {
   handleLoadOnScroll,
   handleSelect,
   loadPopular,
   loadPopularSort,
 } from './features';
+//Interfaces
 import { IdataObject } from './interfaces';
 
 const sortingOptions = {
@@ -129,51 +134,48 @@ const List = () => {
         }
       >
         {data &&
-          data.map((object) => {
-            return (
-              <Link
+          data.map((object) => (
+            <Link
+              key={object.id}
+              className={type === 'person' ? 'flex justify-center w-fit' : ' '}
+              to={`/${type}/${object.id}`}
+            >
+              <div
                 className={
-                  type === 'person' ? 'flex justify-center w-fit' : ' '
+                  object.poster_path
+                    ? 'flex w-full border-2 h-40 rounded-lg'
+                    : 'flex flex-col justify-center items-center w-40 border-2 h-64 rounded-lg'
                 }
-                to={`/${type}/${object.id}`}
               >
-                <div
+                <img
                   className={
                     object.poster_path
-                      ? 'flex w-full border-2 h-40 rounded-lg'
-                      : 'flex flex-col justify-center items-center w-40 border-2 h-64 rounded-lg'
+                      ? 'h-full rounded-l-lg'
+                      : 'w-32 rounded-lg'
                   }
-                >
-                  <img
-                    className={
-                      object.poster_path
-                        ? 'h-full rounded-l-lg'
-                        : 'w-32 rounded-lg'
-                    }
-                    src={`${urlForImage}${
-                      object.poster_path
-                        ? object.poster_path
-                        : object.profile_path
-                    }`}
-                    alt=""
-                  />
-                  <div className="flex flex-col justify-center p-2">
-                    <div className="h-3/5">
-                      <p className="text-white line-clamp-2">
-                        {object.title ? object.title : object.name}
-                      </p>
-                      <p className="text-white">
-                        {object.release_date
-                          ? object.release_date
-                          : object.first_air_date}
-                      </p>
-                    </div>
-                    <p className="text-white line-clamp-2">{object.overview}</p>
+                  src={`${urlForImage}${
+                    object.poster_path
+                      ? object.poster_path
+                      : object.profile_path
+                  }`}
+                  alt=""
+                />
+                <div className="flex flex-col justify-center p-2">
+                  <div className="h-3/5">
+                    <p className="text-white line-clamp-2">
+                      {object.title ? object.title : object.name}
+                    </p>
+                    <p className="text-white">
+                      {object.release_date
+                        ? object.release_date
+                        : object.first_air_date}
+                    </p>
                   </div>
+                  <p className="text-white line-clamp-2">{object.overview}</p>
                 </div>
-              </Link>
-            );
-          })}
+              </div>
+            </Link>
+          ))}
       </div>
       <div className="flex justify-center items-center">
         <BsArrowDownCircle className="text-white text-5xl animate-bounce" />

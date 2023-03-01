@@ -1,11 +1,14 @@
+//Hooks
 import { useState } from 'react';
+//React Router
 import { HashRouter, Route, Routes } from 'react-router-dom';
-
+//Pages
 import Home from './assets/pages/HomePage/Home';
 import Movie from './assets/pages/Movie/Movie';
 import Actors from './assets/pages/Actors/Actors';
 import List from './assets/pages/List/List';
 import Search from './assets/pages/Search/Search';
+//Layers
 import Nav from './assets/layers/nav/Nav';
 import Footer from './assets/layers/footer/Footer';
 

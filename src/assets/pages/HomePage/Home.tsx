@@ -1,18 +1,19 @@
-import { useEffect, useState } from 'react';
+//Hooks & fragment
+import { Fragment, useEffect, useState } from 'react';
+//React Router
+import { Link, useNavigate } from 'react-router-dom';
+//React Icons
 import { BsDot, BsSearch } from 'react-icons/bs';
 import { FaRegSadCry } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+//Utils
 import {
   loadFeatured,
   loadPopularActors,
   loadTopRated,
   loadTrending,
 } from './features';
-
-interface IHome {
-  searchInput: string;
-  setSearchInput: React.Dispatch<React.SetStateAction<string>>;
-}
+//Interfaces
+import { IHome } from './interfaces';
 
 const Home = ({ searchInput, setSearchInput }: IHome) => {
   const [mediaType, setMediaType] = useState('movie');
@@ -82,13 +83,17 @@ const Home = ({ searchInput, setSearchInput }: IHome) => {
                 {genres &&
                   genres.map((element, index) => {
                     if (index + 1 === genres.length) {
-                      return <span className="text-white">{element}</span>;
+                      return (
+                        <span key={element} className="text-white">
+                          {element}
+                        </span>
+                      );
                     } else {
                       return (
-                        <>
+                        <Fragment key={element}>
                           <span className="text-white">{element}</span>
                           <BsDot className="text-white" />
-                        </>
+                        </Fragment>
                       );
                     }
                   })}
@@ -204,6 +209,7 @@ const Home = ({ searchInput, setSearchInput }: IHome) => {
                 known_for_department?: string;
               }) => (
                 <Link
+                  key={object.id}
                   className="flex justify-center"
                   to={`${mediaType}/${object.id}`}
                 >
@@ -245,6 +251,7 @@ const Home = ({ searchInput, setSearchInput }: IHome) => {
                 topRated.map(
                   (object: { poster_path?: string; id?: number }) => (
                     <Link
+                      key={object.id}
                       className="flex justify-center"
                       to={`movie/${object.id}`}
                     >
@@ -272,6 +279,7 @@ const Home = ({ searchInput, setSearchInput }: IHome) => {
                 id?: number;
               }) => (
                 <Link
+                  key={object.id}
                   className="flex justify-center"
                   to={`person/${object.id}`}
                 >
