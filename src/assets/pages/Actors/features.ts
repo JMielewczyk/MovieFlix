@@ -40,7 +40,6 @@ export const loadMoviesAndTV = async (
   );
   if (!resCredits.ok) return;
   const dataCredits = await resCredits.json();
-  console.log(dataCredits);
   const sortedByPopularity = dataCredits.cast.sort(
     (a: { popularity: number }, b: { popularity: number }) =>
       b.popularity - a.popularity

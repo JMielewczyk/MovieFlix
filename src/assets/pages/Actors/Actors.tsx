@@ -203,7 +203,14 @@ const Actors = () => {
             <p className="text-xl text-white ">Movies</p>
             <div className="flex w-full overflow-x-scroll overflow-y-hidden md:overflow-x-visible md:grid md:gap-2.5 md:gap-y-5 md:justify-items-center  md:grid-cols-[repeat(auto-fill,_minmax(180px,_1fr))]">
               {movieCredits.map((object) => (
-                <Link key={object.id} to={`/movie/${object.id}`}>
+                <Link
+                  key={
+                    typeof object.id === 'number'
+                      ? object.id + Math.floor(Math.random() * 5)
+                      : Math.floor(Math.random() * 100000)
+                  }
+                  to={`/movie/${object.id}`}
+                >
                   <div className="flex flex-col justify-between w-44 h-[300px] border-2 flex-shrink-0 mr-3 rounded-lg">
                     {typeof object.poster_path === 'string' ? (
                       <img
@@ -261,7 +268,14 @@ const Actors = () => {
             <p className="text-xl text-white ">TV Shows</p>
             <div className="flex w-full overflow-x-scroll overflow-y-hidden md:overflow-x-visible md:grid md:gap-2.5 md:gap-y-5 md:justify-items-center  md:grid-cols-[repeat(auto-fill,_minmax(180px,_1fr))]">
               {tvCredits.map((object) => (
-                <Link key={object.id} to={`/tv/${object.id}`}>
+                <Link
+                  key={
+                    typeof object.id === 'number'
+                      ? object.id + Math.floor(Math.random() * 5)
+                      : Math.floor(Math.random() * 100000)
+                  }
+                  to={`/tv/${object.id}`}
+                >
                   <div className="flex flex-col justify-between w-44 min-h-full border-2 flex-shrink-0 mr-3 rounded-lg">
                     {typeof object.poster_path === 'string' ? (
                       <img
@@ -328,7 +342,14 @@ const Actors = () => {
                   }
                 >
                   {movieTimeline.map((object) => (
-                    <Link key={object.id} to={`/movie/${object.id}`}>
+                    <Link
+                      key={
+                        typeof object.id === 'number'
+                          ? object.id + Math.floor(Math.random() * 5)
+                          : Math.floor(Math.random() * 100000)
+                      }
+                      to={`/movie/${object.id}`}
+                    >
                       <div className="flex gap-5 border-b border-slate-500 pl-2.5">
                         <div className="flex justify-center items-center ">
                           <p className="text-white">{object.release_date}</p>
@@ -377,7 +398,14 @@ const Actors = () => {
                   }
                 >
                   {tvTimeline.map((object) => (
-                    <Link key={object.id} to={`/tv/${object.id}`}>
+                    <Link
+                      key={
+                        typeof object.id === 'number'
+                          ? object.id + Math.floor(Math.random() * 5)
+                          : Math.floor(Math.random() * 100000)
+                      }
+                      to={`/tv/${object.id}`}
+                    >
                       <div className="flex gap-5 border-b border-slate-500 pl-2.5">
                         <div className="flex justify-center items-center ">
                           <p className="text-white">{object.first_air_date}</p>
@@ -423,7 +451,11 @@ const Actors = () => {
             <div className="flex h-[300px] overflow-x-scroll scrollbar scrollbar-track-slate-500 scrollbar-track-rounded-lg scrollbar-thumb-slate-300 scrollbar-thumb-rounded-lg">
               {images.map((object: { file_path?: string; id?: number }) => (
                 <div
-                  key={object.id}
+                  key={
+                    typeof object.id === 'number'
+                      ? object.id + Math.floor(Math.random() * 5)
+                      : Math.floor(Math.random() * 100000)
+                  }
                   className="w-44 h-full  flex-shrink-0 mr-3"
                 >
                   <img
