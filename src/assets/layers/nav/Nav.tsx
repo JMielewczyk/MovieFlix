@@ -36,24 +36,143 @@ const Nav = () => {
       <nav
         className={`w-full ${
           scrollDirection === 'down' ? '-top-24' : 'top-0'
-        } h-16 bg-transparent sticky top-0 left-0 z-10 flex justify-between items-center p-5 backdrop-blur-sm transition-all`}
+        } max-w-screen-2xl m-auto h-16 bg-transparent sticky top-0 left-0 z-10 flex justify-between md:justify-start md:gap-16 items-start p-2.5 backdrop-blur-sm transition-all`}
       >
-        <Link to="/" className="text-3xl font-bold text-white">
+        <Link to="/" className="text-3xl font-bold text-white md:pr-10">
           MovieFlix
         </Link>
-
         <AiOutlineMenu
           onClick={() => {
             setIsAsideOpen((prevState) => !prevState);
           }}
-          className="text-white h-full w-6"
+          className="text-white h-full w-6 md:hidden"
         />
+        <ul
+          className={`hidden md:block
+            ${
+              moviesCategories
+                ? ' bg-black cursor-pointer rounded-lg  text-3xl h-62  text-white text-center transition-all'
+                : ' text-3xl cursor-pointer h-10 overflow-hidden text-white text-center'
+            }
+          `}
+          onClick={() => {
+            setMoviesCategories((prevState) => !prevState);
+            setTVCategories(false);
+            setPeopleActive(false);
+          }}
+        >
+          Movies
+          <Link
+            onClick={() => {
+              setIsAsideOpen(false);
+            }}
+            to={`list/movie/popular`}
+          >
+            <li className="text-xl mt-3 pl-2 pr-2">Popular</li>
+          </Link>
+          <Link
+            onClick={() => {
+              setIsAsideOpen(false);
+            }}
+            to={`list/movie/top_rated`}
+          >
+            <li className="text-xl mt-3 pl-2 pr-2">Best rating</li>
+          </Link>
+          <Link
+            onClick={() => {
+              setIsAsideOpen(false);
+            }}
+            to={`list/movie/upcoming`}
+          >
+            <li className="text-xl mt-3 pl-2 pr-2">Upcoming</li>
+          </Link>
+          <Link
+            onClick={() => {
+              setIsAsideOpen(false);
+            }}
+            to={`list/movie/now_playing`}
+          >
+            <li className="text-xl mt-3 pl-2 pr-2 pb-3">In Theaters</li>
+          </Link>
+        </ul>
+        <ul
+          className={`hidden md:block
+            ${
+              tvCategories
+                ? ' bg-black cursor-pointer rounded-lg  text-3xl h-62  text-white text-center transition-all'
+                : ' text-3xl cursor-pointer h-10 overflow-hidden text-white text-center'
+            }
+          `}
+          onClick={() => {
+            setTVCategories((prevState) => !prevState);
+            setMoviesCategories(false);
+            setPeopleActive(false);
+          }}
+        >
+          TV Shows
+          <Link
+            onClick={() => {
+              setIsAsideOpen(false);
+            }}
+            to={`list/tv/popular`}
+          >
+            <li className="text-xl mt-3 pl-2 pr-2">Popular</li>
+          </Link>
+          <Link
+            onClick={() => {
+              setIsAsideOpen(false);
+            }}
+            to={`list/tv/top_rated`}
+          >
+            <li className="text-xl mt-3 pl-2 pr-2">Best rating</li>
+          </Link>
+          <Link
+            onClick={() => {
+              setIsAsideOpen(false);
+            }}
+            to={`list/tv/on_the_air`}
+          >
+            <li className="text-xl mt-3 pl-2 pr-2">In TV</li>
+          </Link>
+          <Link
+            onClick={() => {
+              setIsAsideOpen(false);
+            }}
+            to={`list/tv/airing_today`}
+          >
+            <li className="text-xl mt-3 pl-2 pr-2 pb-3">Today in TV</li>
+          </Link>
+        </ul>
+        <ul
+          className={`hidden md:block 
+          ${
+            peopleActive
+              ? ' bg-black cursor-pointer rounded-lg  text-3xl h-62  text-white text-center transition-all'
+              : ' text-3xl cursor-pointer h-10 overflow-hidden text-white text-center'
+          }
+          `}
+          onClick={() => {
+            setPeopleActive((prevState) => !prevState);
+            setMoviesCategories(false);
+            setTVCategories(false);
+          }}
+        >
+          People
+          <Link
+            onClick={() => {
+              setIsAsideOpen(false);
+            }}
+            to={`list/person/popular`}
+          >
+            <li className="text-xl mt-3 pl-2 pr-2 pb-3">Popular people</li>
+          </Link>
+        </ul>
       </nav>
       <aside
         className={
           isAsideOpen
-            ? 'flex flex-col w-screen overflow-y-scroll h-screen fixed top-0 left-0 z-20 flex-grow bg-black/50 backdrop-blur-md  translate-x-0 transition-all'
-            : 'flex flex-col w-screen overflow-y-scroll h-screen fixed top-0 left-0 z-20 flex-grow  bg-black/50 backdrop-blur-md  translate-x-full transition-all'
+            ? 'flex md:hidden flex-col w-screen overflow-y-scroll h-screen fixed top-0 left-0 z-20 flex-grow bg-black/50 backdrop-blur-md  translate-x-0 transition-all'
+            : 'flex md:hidden flex-col w-screen overflow-y-scroll h-screen fixed top-0 left-0 z-20 flex-grow  bg-black/50 backdrop-blur-md  translate-x-full transition-all'
         }
       >
         <div className="flex w-full h-16 justify-end items-center p-4">
